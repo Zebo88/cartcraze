@@ -1,8 +1,7 @@
-# React + Vite
+# Capstone Project
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project is for the Capstone assignment of the Fullstack Academy Bootcamp.
 
-Currently, two official plugins are available:
+The application is for an E-commerce website called CartCraze.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+The API that was used for this app is: https://fakestoreapi.com/docs
