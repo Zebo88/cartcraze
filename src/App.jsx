@@ -12,6 +12,7 @@ import Login from './components/login'
 
 function App() {
   const [token, setToken] = useState(null);
+  const [products, setProducts] = useState([]);
 
   return (
     <>
@@ -22,8 +23,16 @@ function App() {
       </div>
       <div className='app-container'>
         <Routes>
-          <Route path='/' element={<Home/>}/>
-          <Route path='/products' element={<Products/>}/>
+          <Route path='/' element={<Home
+              products={products}
+              setProducts={setProducts}
+            />}
+          />
+          <Route path='/products' element={<Products
+              products={products}
+              setProducts={setProducts}
+            />}
+          />
           <Route path='/account' element={<Account
               token={token}
               setToken={setToken}
