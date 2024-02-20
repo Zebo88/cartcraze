@@ -77,7 +77,7 @@ export async function getProductCategories(){
 // Get all products of a specific category
 export async function getProductsOfCategory(category){
   try {
-    const response = await fetch(`${API_URL}/categories/${category}`);
+    const response = await fetch(`${API_URL}/category/${category}`);
     const result = await response.json();
     
     return result;

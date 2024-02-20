@@ -1,4 +1,5 @@
-import { React, useEffect } from "react";
+import { React, useEffect, useState } from "react";
+import Rating from './rating';
 import Carousel from 'react-bootstrap/Carousel';
 import Button from 'react-bootstrap/Button';
 import CardGroup from 'react-bootstrap/CardGroup';
@@ -8,17 +9,24 @@ import Row from 'react-bootstrap/Row';
 import jewelryAd from '../images/jewelryAdNarrow.jpg'
 import hatAd from '../images/hatAdNarrow.jpg'
 import earbudsAd from '../images/earbudsAdNarrow.jpg'
-import { getAllProducts } from "../api/products";
+import { getAllProducts, getProductsOfCategory } from "../api/products";
+import Category from "./category";
 
 
 export default function Home({ products, setProducts }){
+  const [category, setCategory] = useState("");
 
   useEffect(() => {
     async function fetchProducts() {
       try {
-        const products = await getAllProducts();
-
-        setProducts(products);
+        if(category === ""){
+          const allProducts = await getAllProducts();
+          setProducts(allProducts);
+        }else{
+          const categoryProducts = await getProductsOfCategory(category);
+          setProducts(categoryProducts);
+        }
+        
 
       } catch (error) {
         console.error(error);
@@ -27,7 +35,17 @@ export default function Home({ products, setProducts }){
     
     fetchProducts();
 
-  },[products]);
+  },[category]);
+
+  function capitalizeWords(string){
+      if(string.includes(" ")){
+        const index = string.indexOf(" ");
+        return string.slice(0,1).toUpperCase() + string.slice(1,index+1) + string.slice(index+1,index+2).toUpperCase() + string.slice(index+2);
+      }else{
+        return string.slice(0,1).toUpperCase() + string.slice(1);
+      }
+  }
+
   
   return(
     <div className="home-container">
@@ -49,22 +67,36 @@ export default function Home({ products, setProducts }){
         </Carousel.Item>
       </Carousel>
 
+      <div className="container category-container">
+        <Category setCategory={setCategory}/>
+        { category && <div className="category-pill">{capitalizeWords(category)}<h6 className="x" onClick={()=>{setCategory("")}} >x</h6></div>}
+
+      </div>
+
       <div className="container">
+        {category ? <h3>{capitalizeWords(category)}</h3> : <h3>All Products</h3>}
         <CardGroup>
-        <Row xs={2} md={3} lg={4} xl={5} className="g-4">
-        {products.map((product, idx) => (
-          <Col key={idx}>
-            <Card style={{ height:"450px" }}>
-              <Card.Img variant="top" src={product.image} style={{ height:"15rem", objectFit:"contain", padding:"10px" }}/>
-              <Card.Body>
-                <Card.Title>{`${product.title.slice(0,40)}...`}</Card.Title>
-                <Card.Text>Rating: {product.rating.rate}</Card.Text>
-                <Card.Text style={{ fontSize:"15pt" }}>${product.price}</Card.Text>
-              </Card.Body>
-            </Card>
-          </Col>
-        ))}
-    </Row>
+          <Row xs={2} md={3} lg={4} xl={5} className="g-4">
+            { products && products.map((product, idx) => (
+              <Col key={idx}>
+                <Card style={{ height:"450px" }}>
+                  <Card.Img variant="top" src={product.image} style={{ height:"15rem", objectFit:"contain", padding:"10px" }}/>
+                  <Card.Body>
+                    <Card.Title>{ product.title.length > 50 ?
+                      `${product.title.slice(0,50)}...`
+                      :
+                      product.title
+                      }
+                    </Card.Title>
+                    <div className="rating-container">
+                      Rating: {<Rating rate={product.rating.rate} />} {product.rating.rate}
+                    </div>
+                    <Card.Text style={{ fontSize:"15pt" }}>${product.price}</Card.Text>
+                  </Card.Body>
+                </Card>
+              </Col>
+            ))}
+          </Row>
         </CardGroup>
       
       </div>

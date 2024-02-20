@@ -236,7 +236,7 @@ label {
 /* Home */
 .home-container{
   display: grid;
-  /* justify-content: center; */
+  background-color: #f7f7f7;
 }
 
 .advertisement{
@@ -244,6 +244,38 @@ label {
 
 }
 
+.category-container{
+  display: flex !important;
+}
+
+.category-pill{
+  display: flex;
+  margin: 2px 20px ;
+  padding: 0 8px;
+  border: solid;
+  border-radius: 20px !important;
+  border-width: 1px;
+}
+
+.x{
+  margin: 2px 2px 2px 8px;
+}
+
+.x:hover{
+  font-weight: bolder;
+  font-size: 13pt;
+  cursor: pointer;
+}
+
 .container{
   margin: 30px;
 }
+
+.rating-container{
+  margin-bottom: 10px;
+}
+
+.starbox{
+  display: inline;
+}
+
