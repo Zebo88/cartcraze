@@ -66,6 +66,9 @@ export async function addUser(email, username, password, name, address, phone){
   try {
     const response = await fetch(API_URL,{
       method: 'POST',
+      headers: {
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify({
         email, 
         username, 
@@ -80,6 +83,7 @@ export async function addUser(email, username, password, name, address, phone){
     return result;
   } catch (error) {
     console.error(error);
+    return "Unable to register! Please try again.";
   }
 }
 

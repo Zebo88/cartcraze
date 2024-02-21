@@ -8,6 +8,9 @@ import Account from './components/account'
 import Products from './components/products';
 import Cart from './components/cart'
 import Login from './components/login'
+import Registration from './components/registration';
+import Footer from './components/footer';
+import Contact from './components/contact';
 
 
 function App() {
@@ -43,8 +46,17 @@ function App() {
               setToken={setToken}
             />}
           />
+          <Route path='/registration' element={<Registration
+              token={token}
+              setToken={setToken}
+            />}
+          />
           <Route path='/cart' element={<Cart/>}/>
+          <Route path='/contact' element={<Contact/>}/>
         </Routes>
+      </div>
+      <div className='footer-container'>
+        <Footer/>
       </div>
     </> 
   )

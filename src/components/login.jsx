@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Alert from 'react-bootstrap/Alert';
 import { login } from "../api/login";
+import Registration from "./registration";
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 
@@ -13,12 +14,16 @@ export default function Login({ token, setToken, setAccountData }){
   const [type, setType] = useState('password');
   const navigate = useNavigate();
 
-  async function handleSubmit(event){
+  async function handleLoginSubmit(event){
     event.preventDefault();
 
     try {
+      if(username === '' || password === ''){
+        setMessage("Please enter a username AND password!");
+        return;
+      }
       const response = await login(username, password);    
-      console.log(response);
+
       if(response.token){
         setToken(response.token);
         navigate('/');
@@ -41,18 +46,21 @@ export default function Login({ token, setToken, setAccountData }){
     }
  }
 
+ function dismissAlert(){
+  setMessage(null);
+ }
+
   return(
     <div className="main-container">
       { message && 
-          <Alert variant="danger" onClose={() => setShow(false)} dismissible className="alert-container">
-            {/* <Alert.Heading>{ message }</Alert.Heading> */}
+          <Alert variant="danger" onClose={ dismissAlert } dismissible className="alert-container">
             <p>{ message }</p>
           </Alert>
       }
       <div className="login-container">
         <h4>Sign In</h4>
         
-        <Form onSubmit={ handleSubmit }>
+        <Form onSubmit={ handleLoginSubmit }>
           <Form.Group className="mb-3" controlId="formBasicEmail">
             <Form.Control 
               type="username" 
@@ -75,20 +83,17 @@ export default function Login({ token, setToken, setAccountData }){
             <Button variant="primary" type="submit" size="sm" >
               Login
             </Button>
-          </div>
+          </div>     
+          </Form>
 
           <hr />
-          
-          <Form.Group className="mb-3" controlId="formBasicPassword">
+
+
             <Form.Label style={{fontSize:"12pt"}}>New to CartCraze?</Form.Label>
-              <br />
-              <div className="d-grid gap-2">
-                <Button variant="outline-secondary" type="submit" size="sm">
-                  Create Account
-                </Button> 
-              </div>    
-            </Form.Group>      
-          </Form>
+            <div className="d-grid gap-2">
+              <Link to={'/registration'} className="create-account-link" onClick={() => { navigate('/registration') }}>Create Account</Link>
+            </div>    
+
         </div>
       </div>
     )

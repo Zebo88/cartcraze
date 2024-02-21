@@ -46,7 +46,6 @@ export default function Home({ products, setProducts }){
       }
   }
 
-  
   return(
     <div className="home-container">
       <Carousel data-bs-theme="dark" indicators={false}>
