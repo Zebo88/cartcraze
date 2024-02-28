@@ -16,6 +16,7 @@ export async function getAllProducts(){
 
 // Get a single product from the API
 export async function getSingleProduct(productId){
+
   try {
     const response = await fetch(`${API_URL}/${productId}`);
     const result = await response.json();
@@ -23,6 +24,7 @@ export async function getSingleProduct(productId){
     return result;
   } catch (error) {
     console.error(error);
+    return error.message;
   }
 }
 

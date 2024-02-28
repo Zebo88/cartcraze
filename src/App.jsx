@@ -11,11 +11,19 @@ import Login from './components/login'
 import Registration from './components/registration';
 import Footer from './components/footer';
 import Contact from './components/contact';
+import SingleProduct from './components/singleproduct';
+import Checkout from './components/checkout'
 
 
 function App() {
   const [token, setToken] = useState(null);
   const [products, setProducts] = useState([]);
+  const [singleProduct, setSingleProduct] = useState(null);
+  const [singleProductId, setSingleProductId] = useState(null);
+  const [quantity, setQuantity] = useState(1);
+  const [recentlyViewed, setRecentlyViewed] = useState([]);
+  const [cart, setCart] = useState([]);
+  let cartArr = [];
 
   return (
     <>
@@ -29,11 +37,32 @@ function App() {
           <Route path='/' element={<Home
               products={products}
               setProducts={setProducts}
+              singleProduct={singleProduct}
+              setSingleProduct={setSingleProduct}
+              singleProductId={singleProductId}
+              setSingleProductId={setSingleProductId}
+              recentlyViewed={recentlyViewed}
+              setRecentlyViewed={setRecentlyViewed}
             />}
           />
           <Route path='/products' element={<Products
               products={products}
               setProducts={setProducts}
+            />}
+          />
+          <Route path='/products/:id' element={<SingleProduct
+              token={token}
+              singleProduct={singleProduct}
+              setSingleProduct={setSingleProduct}
+              singleProductId={singleProductId}
+              setSingleProductId={setSingleProductId}
+              quantity={quantity}
+              setQuantity={setQuantity}
+              recentlyViewed={recentlyViewed}
+              setRecentlyViewed={setRecentlyViewed}
+              cart={cart}
+              setCart={setCart}
+              cartArr={cartArr}
             />}
           />
           <Route path='/account' element={<Account
@@ -51,13 +80,27 @@ function App() {
               setToken={setToken}
             />}
           />
-          <Route path='/cart' element={<Cart/>}/>
+          <Route path='/cart' element={<Cart
+              quantity={quantity}
+              setQuantity={setQuantity}
+              cart={cart}
+              setCart={setCart}
+              cartArr={cartArr}
+            />}
+          />
+          <Route path='/checkout' element={<Checkout
+              token={token}
+              cart={cart}
+              setCart={setCart}
+            />}
+          />
           <Route path='/contact' element={<Contact/>}/>
+
         </Routes>
       </div>
-      <div className='footer-container'>
+      {/* <div className='footer-container'>
         <Footer/>
-      </div>
+      </div> */}
     </> 
   )
 }

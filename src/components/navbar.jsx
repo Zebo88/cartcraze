@@ -28,6 +28,7 @@ export default function NavigationBar({ token }){
           <InputGroup size="sm" className="navSearch">
             <Form.Control
               type="text"
+              id="searchBar"
             />
             <Button variant="primary" id="button-addon2">
               <img src={magnifyingGlass} alt="search" className="search-icon" />

@@ -1,4 +1,5 @@
 import { React, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Rating from './rating';
 import Carousel from 'react-bootstrap/Carousel';
 import Button from 'react-bootstrap/Button';
@@ -12,9 +13,9 @@ import earbudsAd from '../images/earbudsAdNarrow.jpg'
 import { getAllProducts, getProductsOfCategory } from "../api/products";
 import Category from "./category";
 
-
-export default function Home({ products, setProducts }){
+export default function Home({ products, setProducts, singleProduct, setSingleProduct, singleProductId, setSingleProductId, recentlyViewed, setRecentlyViewed }){
   const [category, setCategory] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchProducts() {
@@ -51,18 +52,12 @@ export default function Home({ products, setProducts }){
       <Carousel data-bs-theme="dark" indicators={false}>
         <Carousel.Item interval={5000}>
           <img src={jewelryAd} alt="jewelry ad" className="advertisement w-100"/>
-          <Carousel.Caption>
-          </Carousel.Caption>
         </Carousel.Item>
         <Carousel.Item interval={5000}>
           <img src={hatAd} alt="men's headwear ad" className="advertisement w-100"/>
-          <Carousel.Caption>
-          </Carousel.Caption>
         </Carousel.Item>
         <Carousel.Item interval={5000}>
         <img src={earbudsAd} alt="earbuds ad" className="advertisement w-100"/>
-          <Carousel.Caption>
-          </Carousel.Caption>
         </Carousel.Item>
       </Carousel>
 
@@ -78,10 +73,15 @@ export default function Home({ products, setProducts }){
           <Row xs={2} md={3} lg={4} xl={5} className="g-4">
             { products && products.map((product, idx) => (
               <Col key={idx}>
-                <Card style={{ height:"450px" }}>
-                  <Card.Img variant="top" src={product.image} style={{ height:"15rem", objectFit:"contain", padding:"10px" }}/>
+                <Card style={{ height:"30rem" }}>
+                  <Card.Img 
+                    className="card-img" 
+                    variant="top" 
+                    src={product.image} 
+                    style={{ height:"15rem", objectFit:"contain", padding:"10px" }} 
+                    onClick={()=>{setSingleProductId(product.id); navigate(`/products/:${product.id}`)}}/>
                   <Card.Body>
-                    <Card.Title>{ product.title.length > 50 ?
+                    <Card.Title className="card-title" onClick={()=>{setSingleProductId(product.id); navigate(`/products/:${product.id}`)}}>{ product.title.length > 50 ?
                       `${product.title.slice(0,50)}...`
                       :
                       product.title
@@ -90,7 +90,7 @@ export default function Home({ products, setProducts }){
                     <div className="rating-container">
                       Rating: {<Rating rate={product.rating.rate} />} {product.rating.rate}
                     </div>
-                    <Card.Text style={{ fontSize:"15pt" }}>${product.price}</Card.Text>
+                    <Card.Text style={{ fontSize:"15pt" }}>${product.price.toFixed(2)}</Card.Text>
                   </Card.Body>
                 </Card>
               </Col>

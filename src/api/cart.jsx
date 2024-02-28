@@ -77,7 +77,7 @@ export async function getCartsInDateRange(startDate, endDate){
 }
 
 // Get users' carts (ex: https://fakestoreapi.com/carts/user/2 will get all the carts for user #2)
-export async function getCartsInDateRange(userId){
+export async function getAllCartsForUser(userId){
   try {
     const response = await fetch(`${API_URL}carts/user/${userId}`);
     const result = await response.json();

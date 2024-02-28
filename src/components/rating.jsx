@@ -39,7 +39,7 @@ export default function Rating({ rate }){
     const stars = starArr.map((val, i) => {
       return (<div key={i} 
         className="starbox" 
-        style={{background: `linear-gradient(90deg, #ff643d 
+        style={{background: `linear-gradient(90deg, #ffb62f
         ${val * 100}%, #bbbac0 ${val * 100}%)`}}>★</div>);
       })
 
