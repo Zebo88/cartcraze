@@ -79,12 +79,26 @@ export default function Home({ products, setProducts, singleProduct, setSinglePr
                     variant="top" 
                     src={product.image} 
                     style={{ height:"15rem", objectFit:"contain", padding:"10px" }} 
-                    onClick={()=>{setSingleProductId(product.id); navigate(`/products/:${product.id}`)}}/>
+                    onClick={()=>{
+                      setSingleProductId(product.id); 
+                      localStorage.setItem('singleProductId', singleProductId);
+                      setRecentlyViewed(recentlyViewed => [...recentlyViewed, product]);
+                      navigate(`/products/:${product.id}`)
+                      }
+                  }/>
                   <Card.Body>
-                    <Card.Title className="card-title" onClick={()=>{setSingleProductId(product.id); navigate(`/products/:${product.id}`)}}>{ product.title.length > 50 ?
-                      `${product.title.slice(0,50)}...`
-                      :
-                      product.title
+                    <Card.Title 
+                      className="card-title" 
+                      onClick={()=>{
+                        setSingleProductId(product.id); 
+                        localStorage.setItem('singleProductId', singleProductId);
+                        setRecentlyViewed(recentlyViewed => [...recentlyViewed, product]);
+                        navigate(`/products/:${product.id}`)
+                        }
+                      }>{ product.title.length > 50 ?
+                        `${product.title.slice(0,50)}...`
+                        :
+                        product.title
                       }
                     </Card.Title>
                     <div className="rating-container">

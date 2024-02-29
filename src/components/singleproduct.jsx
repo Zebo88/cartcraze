@@ -1,7 +1,7 @@
 import {useEffect, useState } from "react";
 import { getSingleProduct } from "../api/products";
 import Rating from './rating';
-import Carousel from 'react-bootstrap/Carousel';
+import { Carousel } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import CardGroup from 'react-bootstrap/CardGroup';
 import Card from 'react-bootstrap/Card';
@@ -17,26 +17,42 @@ export default function SingleProduct({ token, singleProduct, setSingleProduct, 
   const [cat, setCat] = useState(null);
   const [similarItems, setSimilarItems] = useState(null);
 
+  // useEffect to retrieve singleProductId from localStorage
+  useEffect(() => {
+    const storedProductId = localStorage.getItem('singleProductId');
+    if (storedProductId) {
+      setSingleProductId(storedProductId);
+    }
+  }, []);
+
+  // useEffect to update localStorage whenever singleProductId changes
+  useEffect(() => {
+    if (singleProductId) {
+      localStorage.setItem('singleProductId', singleProductId);
+    }
+  }, [singleProductId]);
+
   useEffect(() => {
     async function getProduct() {
       try {
-        const product = await getSingleProduct(singleProductId);
-
-        setSingleProduct(product);
-        setCat(product.category);
-
-        const categoryProducts = await getProductsOfCategory(cat);
-        setSimilarItems(categoryProducts);
-        
-
+        if (singleProductId) {
+          const product = await getSingleProduct(singleProductId);
+          setSingleProduct(product);
+          setCat(product.category);
+    
+          // Fetch similar items only if singleProductId and category are available
+          const categoryProducts = await getProductsOfCategory(cat);
+          // Filter out the current product from the similar items list
+          const filteredSimilarItems = categoryProducts.filter(item => item.id !== singleProductId);
+          setSimilarItems(filteredSimilarItems);
+        }
       } catch (error) {
         console.error(error);
       }
     }
 
     getProduct();   
-
-  },[similarItems, recentlyViewed]);
+  }, [singleProductId, cat]); // Update when singleProductId or category changes
 
   function updateQuantity(value){
     if(value === -1){
@@ -77,6 +93,16 @@ export default function SingleProduct({ token, singleProduct, setSingleProduct, 
     } catch (error) {
       console.error("Error adding item to cart:", error);
     }
+  }
+
+  function chunkArray(array, size) {
+    const chunkedArray = [];
+    let index = 0;
+    while (index < array.length) {
+      chunkedArray.push(array.slice(index, index + size));
+      index += size;
+    }
+    return chunkedArray;
   }
 
   return(
@@ -147,45 +173,136 @@ export default function SingleProduct({ token, singleProduct, setSingleProduct, 
       </Container>
 
       <Container className="similar-items-container">
-        {similarItems && 
+        {similarItems && (
           <>
             <hr />
             <br />
             <h5>Similar Items</h5>
-            <CardGroup>
-              <Row xs={2} md={3} lg={4} xl={5} className="g-3">
-                { similarItems && similarItems.map((product, idx) => 
-                  <>
-                    { product.title !== singleProduct.title &&
-                      <Col key={idx}>
-                      <Card style={{ height:"30rem" }}>
-                        <Card.Img 
-                          className="card-img" 
-                          variant="top" 
-                          src={product.image} 
-                          style={{ height:"15rem", objectFit:"contain", padding:"10px" }} 
-                          onClick={() => { setSingleProductId(product.id); setRecentlyViewed(recentlyViewed => [...recentlyViewed,product]); navigate(`/products/:${product.id}`) }}/>
-                        <Card.Body>
-                          <Card.Title className="card-title" onClick={()=>{setSingleProductId(product.id); setRecentlyViewed(recentlyViewed => [...recentlyViewed,product]); navigate(`/products/:${product.id}`)}}>{ product.title.length > 50 ?
-                            `${product.title.slice(0,50)}...`
-                            :
-                            product.title
-                            }
-                          </Card.Title>
-                          <div className="rating-container">
-                            Rating: {<Rating rate={product.rating.rate} />} {product.rating.rate}
-                          </div>
-                          <Card.Text style={{ fontSize:"15pt" }}>${product.price}</Card.Text>
-                        </Card.Body>
-                      </Card>
-                    </Col>
-                    }
-                  </>
-                )}
-              </Row>
-            </CardGroup>
+            <div style={{ position: 'relative' }}>
+              <Carousel
+                interval={null} 
+                nextIcon={<span style={{ color: 'black', fontSize: '3rem', position: 'absolute', top: '50%', right: '0', transform: 'translateY(-50%)'  }}>&rsaquo;</span>}
+                prevIcon={<span style={{ color: 'black', fontSize: '3rem', position: 'absolute', top: '50%', left: '0', transform: 'translateY(-50%)'  }}>&lsaquo;</span>}
+              >
+                {chunkArray(similarItems, 4).map((chunk, idx) => (
+                  <Carousel.Item key={idx}>
+                    <Row xs={2} md={3} lg={4} xl={5} className="g-3" style={{marginLeft:"55px"}}>
+                      {chunk.map((item, index) => (
+                        <Col key={index} style={{ minWidth: '250px', marginRight: '1px' }}>
+                          <Card className="cardSuggestions" style={{ height: "30rem", marginBottom: '1px' }}>
+                            <Card.Img
+                              className="card-img"
+                              variant="top"
+                              src={item.image}
+                              style={{ height: "15rem", objectFit: "contain", padding: "10px" }}
+                              onClick={() => { 
+                                setSingleProductId(item.id); 
+                                localStorage.setItem('singleProductId', singleProductId);
+                                // Check if the item is already in the recently viewed list
+                                if (!recentlyViewed.find(viewedItem => viewedItem.id === item.id)) {
+                                  // Add the item to the recently viewed list if it's not already present
+                                  setRecentlyViewed(recentlyViewed => [...recentlyViewed, item]);
+                                } 
+                                navigate(`/products/:${item.id}`) 
+                                }
+                              }
+                            />
+                            <Card.Body>
+                              <Card.Title 
+                                className="card-title" 
+                                onClick={() => { 
+                                  setSingleProductId(item.id); 
+                                  localStorage.setItem('singleProductId', singleProductId);
+                                  // Check if the item is already in the recently viewed list
+                                  if (!recentlyViewed.find(viewedItem => viewedItem.id === item.id)) {
+                                    // Add the item to the recently viewed list if it's not already present
+                                    setRecentlyViewed(recentlyViewed => [...recentlyViewed, item]);
+                                  }  
+                                  navigate(`/products/:${item.id}`) 
+                                  }
+                                }>
+                                {item.title.length > 50 ? `${item.title.slice(0, 50)}...` : item.title}
+                              </Card.Title>
+                              <div className="rating-container">
+                                Rating: {<Rating rate={item.rating.rate} />} {item.rating.rate}
+                              </div>
+                              <Card.Text style={{ fontSize: "15pt" }}>${item.price}</Card.Text>
+                            </Card.Body>
+                          </Card>
+                        </Col>
+                      ))}
+                    </Row>
+                  </Carousel.Item>
+                ))}
+              </Carousel>
+            </div>
           </>
-        }
+        )}
+      </Container>
+
+      <Container className="recently-viewed-container">
+        {recentlyViewed[0] && (
+          <>
+            <hr />
+            <br />
+            <h5>Recently Viewed</h5>
+            <div style={{ position: 'relative' }}>
+              <Carousel
+                interval={null}
+                nextIcon={<span style={{ color: 'black', fontSize: '3rem', position: 'absolute', top: '50%', right: '0', transform: 'translateY(-50%)'  }}>&rsaquo;</span>}
+                prevIcon={<span style={{ color: 'black', fontSize: '3rem', position: 'absolute', top: '50%', left: '0', transform: 'translateY(-50%)'  }}>&lsaquo;</span>}
+              >
+                {chunkArray(recentlyViewed, 4).map((chunk, idx) => (
+                  <Carousel.Item key={idx}>
+                    <Row xs={2} md={3} lg={4} xl={5} className="g-3" style={{marginLeft:"55px"}}>
+                      {chunk.map((item, index) => (
+                        <Col key={index} style={{ minWidth: '250px', marginRight: '1px' }}>
+                          <Card style={{ height: "30rem", marginBottom: '1px' }}>
+                            <Card.Img
+                              className="card-img"
+                              variant="top"
+                              src={item.image}
+                              style={{ height: "15rem", objectFit: "contain", padding: "10px" }}
+                              onClick={() => {
+                                setSingleProductId(item.id);
+                                // Check if the item is already in the recently viewed list
+                                if (!recentlyViewed.find(viewedItem => viewedItem.id === item.id)) {
+                                  // Add the item to the recently viewed list if it's not already present
+                                  setRecentlyViewed(recentlyViewed => [...recentlyViewed, item]);
+                                } 
+                                navigate(`/products/:${item.id}`);
+                              }}
+                            />
+                            <Card.Body>
+                              <Card.Title 
+                                className="card-title" 
+                                onClick={() => {
+                                  setSingleProductId(item.id);
+                                  // Check if the item is already in the recently viewed list
+                                  if (!recentlyViewed.find(viewedItem => viewedItem.id === item.id)) {
+                                    // Add the item to the recently viewed list if it's not already present
+                                    setRecentlyViewed(recentlyViewed => [...recentlyViewed, item]);
+                                  } 
+                                  navigate(`/products/:${item.id}`);
+                                }}
+                              >
+                                {item.title.length > 50 ? `${item.title.slice(0, 50)}...` : item.title}
+                              </Card.Title>
+                              <div className="rating-container">
+                                Rating: {<Rating rate={item.rating.rate} />} {item.rating.rate}
+                              </div>
+                              <Card.Text style={{ fontSize: "15pt" }}>${item.price}</Card.Text>
+                            </Card.Body>
+                          </Card>
+                        </Col>
+                      ))}
+                    </Row>
+                  </Carousel.Item>
+                ))}
+              </Carousel>
+            </div>  
+          </>
+        )}
       </Container>
     </>
   )

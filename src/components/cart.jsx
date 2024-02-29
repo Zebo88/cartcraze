@@ -17,18 +17,12 @@ import { faHourglass1 } from "@fortawesome/free-solid-svg-icons";
 
 export default function Cart({ quantity, setQuantity, cart, setCart, cartArr }){
   const navigate = useNavigate();
-  const [userCart, setUserCart] = useState(null);
-  const [cartItems, setCartItems] = useState([]);
   const [subtotalQuantity, setSubtotalQuantity] = useState(0);
   const [subtotalPrice, setSubtotalPrice] = useState(0);
 
   useEffect(() => {
     async function getCartItems() {
       try {
-        // const predefinedCart = await getSingleCart(1);
-        // setUserCart(predefinedCart);
-        // getProductDetails(predefinedCart);
-
         // Retrieve the current cart array from local storage
         const cartFromLocalStorage = localStorage.getItem("cart");
         // Parse the cart array from JSON format to JavaScript array
@@ -36,13 +30,8 @@ export default function Cart({ quantity, setQuantity, cart, setCart, cartArr }){
         // Set cart to the cartArray variable
         setCart(cartArray);
 
-        setUserCart(cartArray);
-        setCartItems(cartArray);
-
         // Set the subtotal and item counts for the cart
         calculateSubtotal(cart);
-
-        console.log(cart);
 
       } catch (error) {
         console.error(error);
@@ -53,52 +42,7 @@ export default function Cart({ quantity, setQuantity, cart, setCart, cartArr }){
 
   },[]);
 
-  // async function getProductDetails(cart){
-  //   try {
-  //     let cartProducts = await Promise.all(
-  //       cart.products.map(async (product) => {
-  //         const prodDetails = await getSingleProduct(product.productId);
-  //         return prodDetails;
-  //       })
-  //     );
-  
-  //     setCartItems(cartProducts);
-
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // }
-
   async function handleDelete(itemId){
-    // const cart = {
-    //   id: userCart.id,
-    //   userId: userCart.userId,
-    //   date: userCart.date,
-    //   products: []
-    // }
-    // userCart.products.map((product) => {
-    //   if(product.productId !== item.id){
-    //     cart.products.push(product);
-    //   }
-    // })
-    // setUserCart(cart);
-
-    // try {
-    //   const response = await updateCart(userCart.id, userCart.userId, userCart.date, userCart.products);
-    //   console.log(response);
-    //   if(response){
-    //     const newCartitems = cartItems.filter((product) => {
-    //       if(product.id !== item.id){
-    //         return product;
-    //       }
-    //     })
-        
-    //     console.log(newCartitems);
-    //     setCartItems(newCartitems);
-    //   }
-    // } catch (error) {
-    //   console.log(error);
-    // }
 
     try {
       // Retrieve the current cart array from localStorage
@@ -114,8 +58,6 @@ export default function Cart({ quantity, setQuantity, cart, setCart, cartArr }){
   
       // Optionally, update state if your component relies on it
       setCart(updatedCart);
-      setUserCart(updatedCart);
-      setCartItems(updatedCart);
 
       // Recalculate subtotal and item quantities
       calculateSubtotal(updatedCart); 
@@ -144,8 +86,6 @@ export default function Cart({ quantity, setQuantity, cart, setCart, cartArr }){
 
       // Update state with the updated cart
       setCart(updatedCart);
-      setUserCart(updatedCart);
-      setCartItems(updatedCart);
 
       calculateSubtotal(updatedCart);
     } catch (error) {
@@ -178,7 +118,7 @@ export default function Cart({ quantity, setQuantity, cart, setCart, cartArr }){
 
         <hr />
         
-        {cartItems[0] ? cartItems.map((item, idx) => (
+        {cart[0] ? cart.map((item, idx) => (
           <Row key={idx} className="g-4">
             <Col>
               <Card style={{ border: "none", height: "auto", margin: "0 20px" }}>
