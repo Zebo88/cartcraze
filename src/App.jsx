@@ -17,11 +17,18 @@ import Checkout from './components/checkout'
 
 function App() {
   const [token, setToken] = useState(null);
+  const [user, setUser] = useState(null);
   const [products, setProducts] = useState([]);
   const [singleProduct, setSingleProduct] = useState(null);
-  const [singleProductId, setSingleProductId] = useState(null);
+  const [singleProductId, setSingleProductId] = useState(() => {
+    const storedProductId = localStorage.getItem('singleProductId');
+    return storedProductId ? storedProductId : null;
+  });
   const [quantity, setQuantity] = useState(1);
-  const [recentlyViewed, setRecentlyViewed] = useState([]);
+  const [recentlyViewed, setRecentlyViewed] = useState(() => {
+    const storedRecentlyViewed = localStorage.getItem('recentlyViewed');
+    return storedRecentlyViewed ? JSON.parse(storedRecentlyViewed) : [];
+  });
   const [cart, setCart] = useState([]);
   let cartArr = [];
 
@@ -68,16 +75,22 @@ function App() {
           <Route path='/account' element={<Account
               token={token}
               setToken={setToken}
+              user={user}
+              setUser={setUser}
             />}
           />
           <Route path='/login' element={<Login
               token={token}
               setToken={setToken}
+              user={user}
+              setUser={setUser}
             />}
           />
           <Route path='/registration' element={<Registration
               token={token}
               setToken={setToken}
+              user={user}
+              setUser={setUser}
             />}
           />
           <Route path='/cart' element={<Cart
@@ -86,6 +99,7 @@ function App() {
               cart={cart}
               setCart={setCart}
               cartArr={cartArr}
+              token={token}
             />}
           />
           <Route path='/checkout' element={<Checkout

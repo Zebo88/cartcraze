@@ -15,10 +15,14 @@ import CartLogo from '../images/CartLogo.jpeg'
 import { faHourglass1 } from "@fortawesome/free-solid-svg-icons";
 
 
-export default function Cart({ quantity, setQuantity, cart, setCart, cartArr }){
+export default function Cart({ quantity, setQuantity, cart, setCart, cartArr, token }){
   const navigate = useNavigate();
   const [subtotalQuantity, setSubtotalQuantity] = useState(0);
   const [subtotalPrice, setSubtotalPrice] = useState(0);
+
+  useEffect(() => {
+    calculateSubtotal(cart);
+  }, [cart]);
 
   useEffect(() => {
     async function getCartItems() {
@@ -106,6 +110,14 @@ export default function Cart({ quantity, setQuantity, cart, setCart, cartArr }){
     setSubtotalPrice(totalPrice);
   }
 
+  function handleSubmit(){
+    if(cart[0]){
+      navigate('/checkout')
+    }else{
+      return;
+    }
+  }
+
   return (
     <Container>
       <Card style={{ padding: "20px" }}>
@@ -113,7 +125,7 @@ export default function Cart({ quantity, setQuantity, cart, setCart, cartArr }){
         <hr style={{ border: "1px solid black" }} />
         <Row className="g-3">
           <Card.Title>{`Subtotal (${subtotalQuantity} Items): $${subtotalPrice.toFixed(2)}`}</Card.Title>
-          <Button className="proceed-btn" onClick={() => { navigate('/checkout') }}>Proceed to Checkout</Button>
+          <Button className="proceed-btn" onClick={handleSubmit}>Proceed to Checkout</Button>
         </Row>
 
         <hr />

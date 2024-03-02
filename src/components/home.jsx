@@ -73,7 +73,7 @@ export default function Home({ products, setProducts, singleProduct, setSinglePr
           <Row xs={2} md={3} lg={4} xl={5} className="g-4">
             { products && products.map((product, idx) => (
               <Col key={idx}>
-                <Card style={{ height:"30rem" }}>
+                <Card style={{ height:"30rem", boxShadow: "2px 2px 10px 0 rgba(0, 0, 0, 0.1)" }}>
                   <Card.Img 
                     className="card-img" 
                     variant="top" 

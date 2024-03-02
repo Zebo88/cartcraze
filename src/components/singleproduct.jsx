@@ -15,7 +15,11 @@ import { getProductsOfCategory } from "../api/products";
 export default function SingleProduct({ token, singleProduct, setSingleProduct, singleProductId, setSingleProductId, quantity, setQuantity, recentlyViewed, setRecentlyViewed, cart, setCart, cartArr }){
   const navigate = useNavigate();
   const [cat, setCat] = useState(null);
-  const [similarItems, setSimilarItems] = useState(null);
+  const [similarItems, setSimilarItems] = useState(() => {
+    const storedSimilarItems = localStorage.getItem('similarItems');
+    return storedSimilarItems ? JSON.parse(storedSimilarItems) : null;
+  });
+  const [cardsPerRow, setCardsPerRow] = useState(1);
 
   // useEffect to retrieve singleProductId from localStorage
   useEffect(() => {
@@ -25,6 +29,15 @@ export default function SingleProduct({ token, singleProduct, setSingleProduct, 
     }
   }, []);
 
+  useEffect(() => {
+    // Retrieve the recently viewed items from local storage
+    const storedRecentlyViewed = localStorage.getItem('recentlyViewed');
+    // Parse the stored value from JSON format to JavaScript array
+    const parsedRecentlyViewed = storedRecentlyViewed ? JSON.parse(storedRecentlyViewed) : [];
+    // Set the recently viewed items state
+    setRecentlyViewed(parsedRecentlyViewed);
+  }, []);
+
   // useEffect to update localStorage whenever singleProductId changes
   useEffect(() => {
     if (singleProductId) {
@@ -32,27 +45,59 @@ export default function SingleProduct({ token, singleProduct, setSingleProduct, 
     }
   }, [singleProductId]);
 
+  // useEffect to update localStorage whenever similarItems changes
   useEffect(() => {
-    async function getProduct() {
+    if (similarItems) {
+      localStorage.setItem('similarItems', JSON.stringify(similarItems));
+    }
+  }, [similarItems]);
+
+  useEffect(() => {
+    async function getProductAndSimilarItems() {
       try {
         if (singleProductId) {
           const product = await getSingleProduct(singleProductId);
-          setSingleProduct(product);
+          // Set the category derived from the fetched product
           setCat(product.category);
-    
-          // Fetch similar items only if singleProductId and category are available
-          const categoryProducts = await getProductsOfCategory(cat);
-          // Filter out the current product from the similar items list
-          const filteredSimilarItems = categoryProducts.filter(item => item.id !== singleProductId);
-          setSimilarItems(filteredSimilarItems);
+          setSingleProduct(product);
+          
+          if (product.category) {
+            // Fetch similar items based on the category
+            const categoryProducts = await getProductsOfCategory(product.category);
+            // Filter out the current product from the similar items list
+            const filteredSimilarItems = categoryProducts.filter(item => item.id !== singleProductId);
+            setSimilarItems(filteredSimilarItems);
+          }
         }
       } catch (error) {
         console.error(error);
       }
     }
+  
+    if (singleProductId) {
+      getProductAndSimilarItems();
+    }
+  }, [singleProductId]);
 
-    getProduct();   
-  }, [singleProductId, cat]); // Update when singleProductId or category changes
+  useEffect(() => {
+    function handleResize() {
+      // Adjust the number of cards per row based on the container width and card width
+      const containerWidth = document.querySelector('.similar-items-container').offsetWidth;
+      const cardWidth = 250; // Assuming the width of each card is 250px
+      const newCardsPerRow = Math.floor(containerWidth / cardWidth);
+      setCardsPerRow(newCardsPerRow);
+    }
+
+    // Listen for window resize events
+    window.addEventListener('resize', handleResize);
+    // Initial adjustment
+    handleResize();
+
+    return () => {
+      // Clean up the event listener
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   function updateQuantity(value){
     if(value === -1){
@@ -63,6 +108,15 @@ export default function SingleProduct({ token, singleProduct, setSingleProduct, 
       setQuantity(quantity + 1);
     }
   };
+
+  function addToRecentlyViewed(item) {
+    // Add the item to recently viewed if it's not already present
+    if (!recentlyViewed.find(viewedItem => viewedItem.id === item.id)) {
+      setRecentlyViewed([...recentlyViewed, item]);
+      // Update local storage with the updated recently viewed items
+      localStorage.setItem('recentlyViewed', JSON.stringify([...recentlyViewed, item]));
+    }
+  }
 
   function addToCartHandler() {
     try {
@@ -80,7 +134,7 @@ export default function SingleProduct({ token, singleProduct, setSingleProduct, 
         cartArray[existingProductIndex].quantity += 1;
       } else {
         // If the product does not exist, add it to the cart with a quantity of 1
-        const productWithQuantity = { ...singleProduct, quantity: 1 };
+        const productWithQuantity = { ...singleProduct, quantity };
         cartArray.push(productWithQuantity);
       }
   
@@ -90,6 +144,10 @@ export default function SingleProduct({ token, singleProduct, setSingleProduct, 
       // Set cart to the cartArray variable and navigate to the cart
       setCart(cartArray);
       navigate('/cart');
+
+      // Add the product to recently viewed items
+      addToRecentlyViewed(singleProduct);
+
     } catch (error) {
       console.error("Error adding item to cart:", error);
     }
@@ -107,13 +165,12 @@ export default function SingleProduct({ token, singleProduct, setSingleProduct, 
 
   return(
     <>
-      <Container style={{ height:"45rem"}}>
+      <Container>
         {singleProduct && 
-          <CardGroup>
-            <Card style={{ height:"35rem", border:"none"}}>
+            <Card style={{  border:"none"}}>
               <Row className="g-4" xs={1} lg={2}>
                 <Col lg="8">
-                <Link onClick={() => {navigate(-1)}} className="back-link">{"< Back to results"}</Link>
+                <Link onClick={() => {navigate(-1)}} className="back-link">{"< Back"}</Link>
                 <br /><br />
                   <Card.Img 
                     className="card-title" 
@@ -168,11 +225,10 @@ export default function SingleProduct({ token, singleProduct, setSingleProduct, 
                 </Col>
               </Row>
             </Card>
-          </CardGroup>
         }
       </Container>
 
-      <Container className="similar-items-container">
+      <Container className="similar-items-container" style={{ maxWidth: '1200px' }}>
         {similarItems && (
           <>
             <hr />
@@ -184,12 +240,12 @@ export default function SingleProduct({ token, singleProduct, setSingleProduct, 
                 nextIcon={<span style={{ color: 'black', fontSize: '3rem', position: 'absolute', top: '50%', right: '0', transform: 'translateY(-50%)'  }}>&rsaquo;</span>}
                 prevIcon={<span style={{ color: 'black', fontSize: '3rem', position: 'absolute', top: '50%', left: '0', transform: 'translateY(-50%)'  }}>&lsaquo;</span>}
               >
-                {chunkArray(similarItems, 4).map((chunk, idx) => (
+                {chunkArray(similarItems, cardsPerRow).map((chunk, idx) => (
                   <Carousel.Item key={idx}>
-                    <Row xs={2} md={3} lg={4} xl={5} className="g-3" style={{marginLeft:"55px"}}>
+                    <Row sm={2} md={3} lg={4} xl={5} className="g-3 justify-content-center">
                       {chunk.map((item, index) => (
-                        <Col key={index} style={{ minWidth: '250px', marginRight: '1px' }}>
-                          <Card className="cardSuggestions" style={{ height: "30rem", marginBottom: '1px' }}>
+                        <Col key={index} style={{ width: '20%', minWidth: '200px', maxWidth: '200px', marginRight: '1px' }}>
+                          <Card className="cardSuggestions" style={{ height: "30rem", marginBottom: '1px', boxShadow: "2px 2px 10px 0 rgba(0, 0, 0, 0.1)" }}>
                             <Card.Img
                               className="card-img"
                               variant="top"
@@ -197,11 +253,13 @@ export default function SingleProduct({ token, singleProduct, setSingleProduct, 
                               style={{ height: "15rem", objectFit: "contain", padding: "10px" }}
                               onClick={() => { 
                                 setSingleProductId(item.id); 
-                                localStorage.setItem('singleProductId', singleProductId);
+                                localStorage.setItem('singleProductId', item.id);
                                 // Check if the item is already in the recently viewed list
                                 if (!recentlyViewed.find(viewedItem => viewedItem.id === item.id)) {
                                   // Add the item to the recently viewed list if it's not already present
                                   setRecentlyViewed(recentlyViewed => [...recentlyViewed, item]);
+                                  // Update local storage with the updated recently viewed items
+                                  localStorage.setItem('recentlyViewed', JSON.stringify([...recentlyViewed, item]));
                                 } 
                                 navigate(`/products/:${item.id}`) 
                                 }
@@ -212,11 +270,13 @@ export default function SingleProduct({ token, singleProduct, setSingleProduct, 
                                 className="card-title" 
                                 onClick={() => { 
                                   setSingleProductId(item.id); 
-                                  localStorage.setItem('singleProductId', singleProductId);
+                                  localStorage.setItem('singleProductId', item.id);
                                   // Check if the item is already in the recently viewed list
                                   if (!recentlyViewed.find(viewedItem => viewedItem.id === item.id)) {
                                     // Add the item to the recently viewed list if it's not already present
                                     setRecentlyViewed(recentlyViewed => [...recentlyViewed, item]);
+                                    // Update local storage with the updated recently viewed items
+                                    localStorage.setItem('recentlyViewed', JSON.stringify([...recentlyViewed, item]));
                                   }  
                                   navigate(`/products/:${item.id}`) 
                                   }
@@ -240,7 +300,7 @@ export default function SingleProduct({ token, singleProduct, setSingleProduct, 
         )}
       </Container>
 
-      <Container className="recently-viewed-container">
+      <Container className="recently-viewed-container" style={{ maxWidth: '1200px' }}>
         {recentlyViewed[0] && (
           <>
             <hr />
@@ -252,12 +312,12 @@ export default function SingleProduct({ token, singleProduct, setSingleProduct, 
                 nextIcon={<span style={{ color: 'black', fontSize: '3rem', position: 'absolute', top: '50%', right: '0', transform: 'translateY(-50%)'  }}>&rsaquo;</span>}
                 prevIcon={<span style={{ color: 'black', fontSize: '3rem', position: 'absolute', top: '50%', left: '0', transform: 'translateY(-50%)'  }}>&lsaquo;</span>}
               >
-                {chunkArray(recentlyViewed, 4).map((chunk, idx) => (
+                {chunkArray(recentlyViewed, cardsPerRow).map((chunk, idx) => (
                   <Carousel.Item key={idx}>
-                    <Row xs={2} md={3} lg={4} xl={5} className="g-3" style={{marginLeft:"55px"}}>
+                    <Row xs={2} md={3} lg={4} xl={5} className="g-3 justify-content-center">
                       {chunk.map((item, index) => (
-                        <Col key={index} style={{ minWidth: '250px', marginRight: '1px' }}>
-                          <Card style={{ height: "30rem", marginBottom: '1px' }}>
+                        <Col key={index} style={{ width: '20%', minWidth: '200px', maxWidth: '200px', marginRight: '1px' }}>
+                          <Card style={{ height: "30rem", marginBottom: '1px', boxShadow: "2px 2px 10px 0 rgba(0, 0, 0, 0.1)" }}>
                             <Card.Img
                               className="card-img"
                               variant="top"
@@ -265,10 +325,13 @@ export default function SingleProduct({ token, singleProduct, setSingleProduct, 
                               style={{ height: "15rem", objectFit: "contain", padding: "10px" }}
                               onClick={() => {
                                 setSingleProductId(item.id);
+                                localStorage.setItem('singleProductId', item.id);
                                 // Check if the item is already in the recently viewed list
                                 if (!recentlyViewed.find(viewedItem => viewedItem.id === item.id)) {
                                   // Add the item to the recently viewed list if it's not already present
                                   setRecentlyViewed(recentlyViewed => [...recentlyViewed, item]);
+                                  // Update local storage with the updated recently viewed items
+                                  localStorage.setItem('recentlyViewed', JSON.stringify([...recentlyViewed, item]));
                                 } 
                                 navigate(`/products/:${item.id}`);
                               }}
@@ -278,10 +341,13 @@ export default function SingleProduct({ token, singleProduct, setSingleProduct, 
                                 className="card-title" 
                                 onClick={() => {
                                   setSingleProductId(item.id);
+                                  localStorage.setItem('singleProductId', item.id);
                                   // Check if the item is already in the recently viewed list
                                   if (!recentlyViewed.find(viewedItem => viewedItem.id === item.id)) {
                                     // Add the item to the recently viewed list if it's not already present
                                     setRecentlyViewed(recentlyViewed => [...recentlyViewed, item]);
+                                    // Update local storage with the updated recently viewed items
+                                    localStorage.setItem('recentlyViewed', JSON.stringify([...recentlyViewed, item]));
                                   } 
                                   navigate(`/products/:${item.id}`);
                                 }}

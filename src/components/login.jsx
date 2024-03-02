@@ -57,7 +57,7 @@ export default function Login({ token, setToken, setAccountData }){
             <p>{ message }</p>
           </Alert>
       }
-      <div className="login-container">
+      <div className="login-container" style={{boxShadow: "2px 2px 10px 0 rgba(0, 0, 0, 0.1)"}}>
         <h4>Sign In</h4>
         
         <Form onSubmit={ handleLoginSubmit }>

@@ -388,23 +388,8 @@ label {
   text-decoration: underline;
 }
 
-/* Media query for smaller screens */
-@media  screen and (max-width: 1199px) {
- .similar-items-container{
+.similar-items-container{
   margin-top: 100px;
- }
-}
-
-@media  screen and (max-width: 990px) {
-  .similar-items-container{
-   margin-top: 500px;
-  }
- }
-
- @media  screen and (max-width: 770px) {
-  .similar-items-container{
-   margin-top: 550px;
-  }
  }
 
 @media  screen and (max-width: 600px) {
@@ -447,4 +432,15 @@ label {
 
 }
 
+/* Account */
+@media  screen and (max-width: 775px) {
+  .profile-form{
+    width: 20rem !important;
+  }
+}
 
+@media  screen and (max-width: 500px) {
+  .profile-form{
+    width: 15rem !important;
+  }
+}
