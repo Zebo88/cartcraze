@@ -10,7 +10,7 @@ import person from '../images/person.svg'
 import { Container } from "react-bootstrap";
 import magnifyingGlass from "../images/magnifying-glass-solid.svg"
 
-export default function NavigationBar({ token }){
+export default function NavigationBar({ token, searchInput, setSearchInput }){
 
   return(
     <>
@@ -29,6 +29,7 @@ export default function NavigationBar({ token }){
             <Form.Control
               type="text"
               id="searchBar"
+              onChange={(e) => {setSearchInput(e.target.value)}}
             />
             <Button variant="primary" id="button-addon2">
               <img src={magnifyingGlass} alt="search" className="search-icon" />

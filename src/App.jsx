@@ -17,6 +17,7 @@ import Checkout from './components/checkout'
 
 function App() {
   const [token, setToken] = useState(null);
+  const [searchInput, setSearchInput] = useState("");
   const [user, setUser] = useState(null);
   const [products, setProducts] = useState([]);
   const [singleProduct, setSingleProduct] = useState(null);
@@ -37,6 +38,8 @@ function App() {
       <div className='nav-container'>
         <NavigationBar
           token={token}
+          searchInput={searchInput}
+          setSearchInput={setSearchInput}
         />
       </div>
       <div className='app-container'>
@@ -50,6 +53,7 @@ function App() {
               setSingleProductId={setSingleProductId}
               recentlyViewed={recentlyViewed}
               setRecentlyViewed={setRecentlyViewed}
+              searchInput={searchInput}
             />}
           />
           <Route path='/products' element={<Products

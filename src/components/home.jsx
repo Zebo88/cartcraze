@@ -12,8 +12,9 @@ import hatAd from '../images/hatAdNarrow.jpg'
 import earbudsAd from '../images/earbudsAdNarrow.jpg'
 import { getAllProducts, getProductsOfCategory } from "../api/products";
 import Category from "./category";
+import Alert from 'react-bootstrap/Alert';
 
-export default function Home({ products, setProducts, singleProduct, setSingleProduct, singleProductId, setSingleProductId, recentlyViewed, setRecentlyViewed }){
+export default function Home({ products, setProducts, singleProduct, setSingleProduct, singleProductId, setSingleProductId, recentlyViewed, setRecentlyViewed, searchInput }){
   const [category, setCategory] = useState("");
   const navigate = useNavigate();
 
@@ -68,13 +69,43 @@ export default function Home({ products, setProducts, singleProduct, setSinglePr
       </div>
 
       <div className="container">
-        {category ? <h3>{capitalizeWords(category)}</h3> : <h3>All Products</h3>}
-        <CardGroup>
-          <Row xs={2} md={3} lg={4} xl={5} className="g-4">
-            { products && products.map((product, idx) => (
-              <Col key={idx}>
-                <Card style={{ height:"30rem", boxShadow: "2px 2px 10px 0 rgba(0, 0, 0, 0.1)" }}>
-                  <Card.Img 
+  {category ? <h3>{capitalizeWords(category)}</h3> : <h3>All Products</h3>}
+  <CardGroup>
+    <Row xs={2} sm={2} md={3} lg={4} xl={5} className="g-4">
+      {products &&
+        (products.filter((product) => {
+          const searchLower = searchInput.toLowerCase();
+          const titleLower = product.title.toLowerCase();
+          const descriptionLower = product.description.toLowerCase();
+          const categoryLower = product.category.toLowerCase();
+
+          // Check if title, description, or category includes the search input
+          return (
+            categoryLower.includes(searchLower) ||
+            titleLower.includes(searchLower) ||
+            descriptionLower.includes(searchLower)
+          );
+        }).length === 0 ? (
+          <Alert variant="danger" style={{width:"300px", margin:"60px 0"}}>No results! Try again.</Alert>
+        ) : (
+          products
+            .filter((product) => {
+              const searchLower = searchInput.toLowerCase();
+              const titleLower = product.title.toLowerCase();
+              const descriptionLower = product.description.toLowerCase();
+              const categoryLower = product.category.toLowerCase();
+
+              // Check if title, description, or category includes the search input
+              return (
+                categoryLower.includes(searchLower) ||
+                titleLower.includes(searchLower) ||
+                descriptionLower.includes(searchLower)
+              );
+            })
+            .map((product, idx) => (
+              <Col key={idx} style={{ minWidth: '200px', maxWidth: 'none' }}>
+                <Card style={{ height: '30rem', boxShadow: '2px 2px 10px 0 rgba(0, 0, 0, 0.1)' }}>
+                <Card.Img 
                     className="card-img" 
                     variant="top" 
                     src={product.image} 
@@ -108,11 +139,11 @@ export default function Home({ products, setProducts, singleProduct, setSinglePr
                   </Card.Body>
                 </Card>
               </Col>
-            ))}
-          </Row>
-        </CardGroup>
-      
-      </div>
+            ))
+        ))}
+    </Row>
+  </CardGroup>
+</div>
     </div>
     
   )

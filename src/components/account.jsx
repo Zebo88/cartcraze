@@ -18,7 +18,7 @@ export default function Account({ token, setToken, user, setUser }){
   const navigate = useNavigate();
 
   useEffect(() => {
-    async function getOrderHistory() {
+    async function getOrderHistoryAndUser() {
       try {
         // Retrieve the current order history array from local storage
         const historyFromLocalStorage = localStorage.getItem("order-history");
@@ -27,12 +27,19 @@ export default function Account({ token, setToken, user, setUser }){
         // Set order history to the orderHistory variable
         setOrderHistory(historyArray);
 
+        // Retrieve the user array from local storage
+        const userFromLocalStorage = localStorage.getItem("user");
+        // Parse the order history array from JSON format to JavaScript array
+        const userObject = userFromLocalStorage ? JSON.parse(userFromLocalStorage) : null;
+        // Set order history to the orderHistory variable
+        setUser(userObject);
+
       } catch (error) {
         console.error(error);
       }
     }
 
-    getOrderHistory();   
+    getOrderHistoryAndUser();   
 
   },[]);
 
@@ -40,8 +47,12 @@ function handleSelect(eventKey){
   setTab(eventKey);
 }
 
+function handleClick(){
+  return;
+}
+
   return(
-    <Container>
+    <Container style={{padding:"20px", backgroundColor:"#f7f7f7"}}>
       <h4>My Account</h4>
       <Container style={{marginBottom:"0"}}>
         <Nav fill variant="tabs" defaultActiveKey="Profile" onSelect={handleSelect}>
@@ -65,12 +76,12 @@ function handleSelect(eventKey){
                   <Form.Label>Email</Form.Label>
                   <Form.Control type="email" placeholder="email@gmail.com" readOnly />
                   <Form.Label>Username</Form.Label>
-                  <Form.Control type="text" placeholder="username..." readOnly />
+                  <Form.Control type="text" placeholder="username" readOnly />
                   <Form.Label>Password</Form.Label>
-                  <Form.Control type="password" placeholder="***********" readOnly />
+                  <Form.Control type="password" placeholder="**********" readOnly />
                   <Form.Label>Address</Form.Label>
-                  <Form.Control as="textarea" placeholder="1234 S 456 W West Jordan, UT 84081" readOnly />
-                  <Button variant="outline-secondary" style={{margin:"30px 0px"}}>Update Info</Button>
+                  <Form.Control as="textarea" placeholder="123 S 456 W Rockville, HI, USA" readOnly />
+                  <Button variant="outline-secondary" style={{margin:"30px 0px"}} onClick={ handleClick }>Update Info</Button>
                 </Form>
               </Card.Body>
           </Card>

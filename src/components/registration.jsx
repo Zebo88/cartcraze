@@ -8,7 +8,7 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 
 
-export default function Registration({ setToken }){
+export default function Registration({ setToken, user, setUser }){
   const [message, setMessage] = useState(null);
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
@@ -56,6 +56,14 @@ export default function Registration({ setToken }){
 
       const response = await addUser(email, username, password, name, address, phone);    
       console.log(response);
+      setUser({ email, username, password, name, address, phone });
+      
+      const user = { email, username, password, name, address, phone };
+      // Convert user object to string
+      const userString = JSON.stringify(user);
+      // Store user string in localStorage under the key 'user'
+      localStorage.setItem('user', userString);
+
       if(response.id){
         navigate('/login'); //No token is received, so I need to route the user to the login page so they can get a token.
       }else{
