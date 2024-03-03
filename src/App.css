@@ -42,8 +42,10 @@ html, body, #root {
 }
 
 .navBrandName{
-  margin: 0;
+  margin: 10px 0 0 0;
   color: rgb(105, 58, 247);
+  font-family: "Timmana", sans-serif;
+  font-size: 22pt;
 }
 
 .navBrandName:hover{
