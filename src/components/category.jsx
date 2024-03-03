@@ -5,7 +5,7 @@ export default function Category({ setCategory }){
 
   return(
     <Dropdown>
-          <Dropdown.Toggle variant="outline-secondary" id="dropdown-basic" size="sm">
+          <Dropdown.Toggle variant="info" id="dropdown-basic" size="sm">
             Category
           </Dropdown.Toggle>
 

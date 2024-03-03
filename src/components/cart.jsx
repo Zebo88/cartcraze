@@ -13,6 +13,7 @@ import { getSingleProduct } from "../api/products";
 import Rating from "./rating";
 import CartLogo from '../images/CartLogo.jpeg'
 import { faHourglass1 } from "@fortawesome/free-solid-svg-icons";
+import Footer from "./footer";
 
 
 export default function Cart({ quantity, setQuantity, cart, setCart, cartArr, token }){
@@ -119,80 +120,86 @@ export default function Cart({ quantity, setQuantity, cart, setCart, cartArr, to
   }
 
   return (
-    <Container>
-      <Card style={{ padding: "20px" }}>
-        <Card.Title style={{ fontSize: "18pt" }}>Shopping Cart</Card.Title>
-        <hr style={{ border: "1px solid black" }} />
-        <Row className="g-3">
-          <Card.Title>{`Subtotal (${subtotalQuantity} Items): $${subtotalPrice.toFixed(2)}`}</Card.Title>
-          <Button className="proceed-btn" onClick={handleSubmit}>Proceed to Checkout</Button>
-        </Row>
+    <>
+      <Container>
+        <Card style={{ padding: "20px" }}>
+          <Card.Title style={{ fontSize: "18pt" }}>Shopping Cart</Card.Title>
+          <hr style={{ border: "1px solid black" }} />
+          <Row className="g-3">
+            <Card.Title>{`Subtotal (${subtotalQuantity} Items): $${subtotalPrice.toFixed(2)}`}</Card.Title>
+            <Button className="proceed-btn" variant="info" onClick={handleSubmit}>Proceed to Checkout</Button>
+          </Row>
 
-        <hr />
-        
-        {cart[0] ? cart.map((item, idx) => (
-          <Row key={idx} className="g-4">
-            <Col>
-              <Card style={{ border: "none", height: "auto", margin: "0 20px" }}>
-                <Row xs={1} lg={2}>
-                  <Col lg="4" className="d-flex justify-content-center align-items-center">
-                    <br /><br />
-                    <Card.Img
-                      className="card-title image"
-                      variant="top"
-                      src={item.image}
-                      style={{ height: "auto", objectFit: "contain", maxWidth: "100%", backgroundColor: "#f5f5f5" }}
-                    />
-                  </Col>
-                  <Col lg="8" style={{ padding: "0 20px 20px 0"}}>
-                    <br /><br />
-                    <Card.Title className="card-title">{item.title}</Card.Title>
-                    <Card.Text style={{ fontSize: "15pt" }} className="price-text">${item.price}</Card.Text>
-                      <div className="quantity-container">
-                        <div className="counter">
-                          <p className="counter-items">Quantity:</p>
-                          <div className="counter-items">
-                            <Button
-                              className="counter-btn"
-                              size="sm"
-                              variant="outline-secondary"
-                              onClick={() => updateQuantity(item.id, -1)}
-                            >-</Button>
-                          </div>
-                          <div className="counter-items">{item.quantity}</div>
-                          <div className="counter-items">
-                            <Button
-                              className="counter-btn"
-                              size="sm"
-                              variant="outline-secondary"
-                              onClick={() => updateQuantity(item.id, 1)}
-                            >+</Button>
+          <hr />
+          
+          {cart[0] ? cart.map((item, idx) => (
+            <Row key={idx} className="g-4">
+              <Col>
+                <Card style={{ border: "none", height: "auto", margin: "0 20px" }}>
+                  <Row xs={1} lg={2}>
+                    <Col lg="4" className="d-flex justify-content-center align-items-center">
+                      <br /><br />
+                      <Card.Img
+                        className="card-title image"
+                        variant="top"
+                        src={item.image}
+                        style={{ height: "auto", objectFit: "contain", maxWidth: "100%", backgroundColor: "#f5f5f5" }}
+                      />
+                    </Col>
+                    <Col lg="8" style={{ padding: "0 20px 20px 0"}}>
+                      <br /><br />
+                      <Card.Title className="card-title">{item.title}</Card.Title>
+                      <Card.Text style={{ fontSize: "15pt" }} className="price-text">${item.price}</Card.Text>
+                        <div className="quantity-container">
+                          <div className="counter">
+                            <p className="counter-items">Quantity:</p>
+                            <div className="counter-items">
+                              <Button
+                                className="counter-btn"
+                                size="sm"
+                                variant="outline-secondary"
+                                onClick={() => updateQuantity(item.id, -1)}
+                              >-</Button>
+                            </div>
+                            <div className="counter-items">{item.quantity}</div>
+                            <div className="counter-items">
+                              <Button
+                                className="counter-btn"
+                                size="sm"
+                                variant="outline-secondary"
+                                onClick={() => updateQuantity(item.id, 1)}
+                              >+</Button>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                        <Button
-                          variant="outline-secondary"
-                          className="deleteFromCart-btn"
-                          size="sm"
-                          style={{ width: "80px", marginTop:"10px" }}
-                          onClick={() => { handleDelete(item.id) }}
-                        >
-                          Delete
-                        </Button>
-                  </Col>
-                </Row>
-              </Card>
-              <hr />
-            </Col>
-          </Row>
-        ))
-        :
-        <Alert variant="warning">
-          There are no items in your cart!
-        </Alert>
-      }
-        <Card.Title style={{fontSize:"12pt"}}>{`Subtotal (${subtotalQuantity} Items): $${subtotalPrice.toFixed(2)}`}</Card.Title>
-      </Card>
-    </Container>
+                          <Button
+                            variant="outline-secondary"
+                            className="deleteFromCart-btn"
+                            size="sm"
+                            style={{ width: "80px", marginTop:"10px" }}
+                            onClick={() => { handleDelete(item.id) }}
+                          >
+                            Delete
+                          </Button>
+                    </Col>
+                  </Row>
+                </Card>
+                <hr />
+              </Col>
+            </Row>
+          ))
+          :
+          <Alert variant="warning">
+            There are no items in your cart!
+          </Alert>
+        }
+          <Card.Title style={{fontSize:"12pt"}}>{`Subtotal (${subtotalQuantity} Items): $${subtotalPrice.toFixed(2)}`}</Card.Title>
+        </Card>
+      </Container>
+
+      {/* <div className='footer-container-checkout'>
+        <Footer/>
+      </div>   */}
+    </>  
   );
 }

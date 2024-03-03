@@ -9,12 +9,14 @@ import cart from '../images/cart2.svg'
 import person from '../images/person.svg'
 import { Container } from "react-bootstrap";
 import magnifyingGlass from "../images/magnifying-glass-solid.svg"
+import { Navigate, useNavigate } from "react-router-dom";
 
 export default function NavigationBar({ token, searchInput, setSearchInput }){
+  const navigate = useNavigate();
 
   return(
     <>
-      <Navbar className="py-0 nav">
+      <Navbar className="py-0 nav" bg="dark" data-bs-theme="dark">
         <Container fluid>
           <Navbar.Brand href="/">
             <div className="navBrand">
@@ -31,7 +33,18 @@ export default function NavigationBar({ token, searchInput, setSearchInput }){
               id="searchBar"
               onChange={(e) => {setSearchInput(e.target.value)}}
             />
-            <Button variant="primary" id="button-addon2">
+            <Button
+              variant="info"
+              id="button-addon2"
+              onClick={() => navigate('/')}
+              tabIndex={0} // Ensure the button is focusable
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  navigate('/');
+                }
+              }}
+            >
               <img src={magnifyingGlass} alt="search" className="search-icon" />
             </Button>
           </InputGroup>
@@ -41,14 +54,14 @@ export default function NavigationBar({ token, searchInput, setSearchInput }){
                 `/account`
                 :
                 `/login`}>
-                <div className="icon-container">
-                  <img src={person} alt="account" className="icon" />
-                </div>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" className="bi bi-person-fill" viewBox="0 0 16 16">
+                    <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                  </svg>
             </Nav.Link>
             <Nav.Link href="/cart">
-              <div className="icon-container">
-                <img src={cart} alt="cart" className="icon" />
-              </div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" className="bi bi-cart4" viewBox="0 0 16 16">
+                  <path d="M0 2.5A.5.5 0 0 1 .5 2H2a.5.5 0 0 1 .485.379L2.89 4H14.5a.5.5 0 0 1 .485.621l-1.5 6A.5.5 0 0 1 13 11H4a.5.5 0 0 1-.485-.379L1.61 3H.5a.5.5 0 0 1-.5-.5M3.14 5l.5 2H5V5zM6 5v2h2V5zm3 0v2h2V5zm3 0v2h1.36l.5-2zm1.11 3H12v2h.61zM11 8H9v2h2zM8 8H6v2h2zM5 8H3.89l.5 2H5zm0 5a1 1 0 1 0 0 2 1 1 0 0 0 0-2m-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0m9-1a1 1 0 1 0 0 2 1 1 0 0 0 0-2m-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0"/>
+                </svg>
             </Nav.Link>
           </div>
           

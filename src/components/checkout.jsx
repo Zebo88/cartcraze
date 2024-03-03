@@ -210,7 +210,7 @@ localStorage.setItem("order-history", JSON.stringify(updatedOrderHistory));
   return(
     <Container className="checkout-container">
       <h3>Checkout</h3>
-      <Link  onClick={() => {navigate(-1)}} className="back-link">Back to Cart</Link>
+      <Link  onClick={() => {navigate(-1)}} className="back-link">{`< Back to Cart`}</Link>
       <br />
       <Card style={{padding:"20px"}}>
       <Card.Title>{`Order Details (${subtotalQuantity} Items)`}</Card.Title>
@@ -455,7 +455,7 @@ localStorage.setItem("order-history", JSON.stringify(updatedOrderHistory));
                   <h5>Total:</h5><p>${(subtotalPrice + 6.00).toFixed(2)}</p>
                 </div>
               </div>
-              <Button onClick={ handleSubmit }>Checkout</Button>
+              <Button variant="info" onClick={ handleSubmit }>Checkout</Button>
               </Card>
             </Container>
           </Col>

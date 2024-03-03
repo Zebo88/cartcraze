@@ -57,13 +57,13 @@ function handleClick(){
       <Container style={{marginBottom:"0"}}>
         <Nav fill variant="tabs" defaultActiveKey="Profile" onSelect={handleSelect}>
         <Nav.Item style={{boxShadow: "2px 2px 10px 0 rgba(0, 0, 0, 0.1)"}}>
-          <Nav.Link eventKey="Profile">Profile</Nav.Link>
+          <Nav.Link eventKey="Profile" style={{color: "#6401f9"}}>Profile</Nav.Link>
         </Nav.Item>
         <Nav.Item style={{boxShadow: "2px 2px 10px 0 rgba(0, 0, 0, 0.1)"}}>
-          <Nav.Link eventKey="Order-History">Order History</Nav.Link>
+          <Nav.Link eventKey="Order-History" style={{color: "#6401f9"}}>Order History</Nav.Link>
         </Nav.Item>
         <Nav.Item style={{boxShadow: "2px 2px 10px 0 rgba(0, 0, 0, 0.1)"}}>
-          <Nav.Link eventKey="Settings">Settings</Nav.Link>
+          <Nav.Link eventKey="Settings" style={{color: "#6401f9"}}>Settings</Nav.Link>
         </Nav.Item>
        </Nav>
       </Container>
@@ -81,7 +81,7 @@ function handleClick(){
                   <Form.Control type="password" placeholder="**********" readOnly />
                   <Form.Label>Address</Form.Label>
                   <Form.Control as="textarea" placeholder="123 S 456 W Rockville, HI, USA" readOnly />
-                  <Button variant="outline-secondary" style={{margin:"30px 0px"}} onClick={ handleClick }>Update Info</Button>
+                  <Button variant="info" style={{margin:"30px 0px"}} onClick={ handleClick }>Update Info</Button>
                 </Form>
               </Card.Body>
           </Card>

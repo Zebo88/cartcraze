@@ -216,7 +216,7 @@ export default function Registration({ setToken, user, setUser }){
           </Form.Group>
 
           <div className="d-grid gap-2">
-            <Button variant="primary" type="submit" size="sm" >
+            <Button variant="info" type="submit" size="sm" >
               Submit
             </Button>
           </div>     

@@ -80,7 +80,7 @@ export default function Login({ token, setToken, setAccountData }){
             <Form.Check type="checkbox" label="Show Password" onClick={ handleToggle }/>
           </Form.Group>
           <div className="d-grid gap-2">
-            <Button variant="primary" type="submit" size="sm" >
+            <Button variant="info" type="submit" size="sm" >
               Login
             </Button>
           </div>     

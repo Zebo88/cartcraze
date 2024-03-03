@@ -3,7 +3,6 @@ import { getSingleProduct } from "../api/products";
 import Rating from './rating';
 import { Carousel } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
-import CardGroup from 'react-bootstrap/CardGroup';
 import Card from 'react-bootstrap/Card';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
@@ -212,7 +211,8 @@ export default function SingleProduct({ token, singleProduct, setSingleProduct, 
                     </div>
                     <Container style={{marginLeft:"0", padding:"0"}} >
                       <Button 
-                        className="addToCartBtn" 
+                        className="addToCartBtn"
+                        variant="info"
                         style={{width:"100%"}} 
                         onClick={ () => addToCartHandler() }
                       >

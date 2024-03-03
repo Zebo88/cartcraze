@@ -35,14 +35,16 @@ function App() {
 
   return (
     <>
-      <div className='nav-container'>
-        <NavigationBar
-          token={token}
-          searchInput={searchInput}
-          setSearchInput={setSearchInput}
-        />
-      </div>
+    <div className='app-wrapper'>
       <div className='app-container'>
+        <div className='nav-container'>
+          <NavigationBar
+            token={token}
+            searchInput={searchInput}
+            setSearchInput={setSearchInput}
+          />
+        </div>
+      
         <Routes>
           <Route path='/' element={<Home
               products={products}
@@ -115,10 +117,13 @@ function App() {
           <Route path='/contact' element={<Contact/>}/>
 
         </Routes>
+      
+      
       </div>
-      {/* <div className='footer-container'>
+     <div className='footer-container'>
         <Footer/>
-      </div> */}
+      </div>
+      </div>
     </> 
   )
 }
