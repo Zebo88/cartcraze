@@ -4,11 +4,27 @@ const client = require('./client');
 async function createCart({ userId, date }) {
   try {
       const { rows } = await client.query(`
-          INSERT INTO carts("userId", date)
+          INSERT INTO carts(user_id, date)
           VALUES ($1, $2)
           RETURNING *;
       `, [userId, date]);
       return rows[0];
+  } catch (error) {
+      throw error;
+  }
+}
+
+async function getCartByUserId(userId) {
+  try {
+      const { rows } = await client.query(`
+          SELECT * FROM carts WHERE user_id = $1;
+      `, [userId]);
+
+      if (rows.length === 0) {
+          return null; // Return null if no cart is found
+      }
+
+      return rows[0]; // Return the first cart found (assuming there's only one per user)
   } catch (error) {
       throw error;
   }
@@ -22,7 +38,7 @@ async function updateCart({ cartId, ...fields }) {
       const { rows } = await client.query(`
           UPDATE carts
           SET ${setFields}
-          WHERE id = $1
+          WHERE cart_id = $1
           RETURNING *;
       `, values);
       return rows[0];
@@ -35,7 +51,7 @@ async function deleteCart(cartId) {
   try {
       const { rows } = await client.query(`
           DELETE FROM carts
-          WHERE id = $1
+          WHERE cart_id = $1
           RETURNING *;
       `, [cartId]);
       return rows[0];
@@ -46,6 +62,7 @@ async function deleteCart(cartId) {
 
 module.exports = {
   createCart,
+  getCartByUserId,
   updateCart,
   deleteCart
 }

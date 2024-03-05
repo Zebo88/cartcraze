@@ -4,7 +4,7 @@ const client = require('./client');
 async function createCartProduct({ cartId, productId, quantity }) {
   try {
     const { rows } = await client.query(`
-      INSERT INTO cartProducts(cart_id, product_id, quantity)
+      INSERT INTO cart_products(cart_id, product_id, quantity)
       VALUES ($1, $2, $3)
       RETURNING *;
     `, [cartId, productId, quantity]);
@@ -22,6 +22,18 @@ async function createCartProduct({ cartId, productId, quantity }) {
   }
 }
 
+async function getCartProductsByCartId(cartId) {
+  try {
+      const { rows } = await client.query(`
+          SELECT * FROM cart_products WHERE cart_id = $1;
+      `, [cartId]);
+
+      return rows; // Return all cart products associated with the provided cartId
+  } catch (error) {
+      throw error;
+  }
+}
+
 // Define the function to update a cart product
 async function updateCartProduct({ id, ...fieldsToUpdate }) {
   try {
@@ -33,9 +45,9 @@ async function updateCartProduct({ id, ...fieldsToUpdate }) {
     let cartProduct;
     if (Object.keys(toUpdate).length > 0) {
       const { rows } = await client.query(`
-        UPDATE cartProducts
+        UPDATE cart_products
         SET ${util.dbFields(toUpdate).insert}
-        WHERE id = ${id}
+        WHERE cart_product_id = ${id}
         RETURNING *;
       `, Object.values(toUpdate));
       cartProduct = rows[0];
@@ -50,8 +62,8 @@ async function updateCartProduct({ id, ...fieldsToUpdate }) {
 async function deleteCartProduct(id) {
   try {
     const { rows } = await client.query(`
-      DELETE FROM cartProducts
-      WHERE id = $1
+      DELETE FROM cart_products
+      WHERE cart_product_id = $1
       RETURNING *;
     `, [id]);
 
@@ -70,6 +82,7 @@ async function deleteCartProduct(id) {
 
 module.exports = {
   createCartProduct,
+  getCartProductsByCartId,
   updateCartProduct,
   deleteCartProduct
 };

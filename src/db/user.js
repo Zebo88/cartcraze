@@ -21,27 +21,46 @@ async function createUser({ email, username, password, firstname, lastname, hous
       return rows[0];
     } else {
       // Handle the case where no rows were returned
-      throw new Error("No rows returned after user creation");
+      throw new Error("User with this username already exists");
     }
   } catch (error) {
+    // Throw a more specific error or handle the case more gracefully
+    console.error('Error in createUser:', error.message);
     throw error;
   }
 }
 
-async function getUser({username, password}) {
-  if (!username || !password) {
-    return;
-  }
-
+async function getUser({ username, password }) {
   try {
+    // Check if username and password are provided
+    if (!username || !password) {
+      throw new Error('Username and password are required');
+    }
+
+    // Retrieve user by username from the database
     const user = await getUserByUsername(username);
-    if(!user) return;
-    const hashedPassword = user.password;
-    const passwordsMatch = await bcrypt.compare(password, hashedPassword);
-    if(!passwordsMatch) return;
+
+    // If user doesn't exist, return an error
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // Compare hashed password with the provided password
+    const passwordsMatch = await bcrypt.compare(password, user.password);
+
+    // If passwords don't match, return an error
+    if (!passwordsMatch) {
+      throw new Error('Incorrect password');
+    }
+
+    // Remove password from the user object before returning
     delete user.password;
+
+    // Return the user object
     return user;
   } catch (error) {
+    // Handle errors gracefully
+    console.error('Error in getUser:', error.message);
     throw error;
   }
 }
@@ -52,7 +71,7 @@ async function getUserById(userId) {
     const {rows: [user]} = await client.query(`
       SELECT *
       FROM users
-      WHERE id = $1;
+      WHERE user_id = $1;
     `, [userId]);
     // if it doesn't exist, return null
     if (!user) return null;

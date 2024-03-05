@@ -30,9 +30,9 @@ server.use('/docs', express.static(path.join(__dirname, 'public')));
 // Router: /api
 server.use('/api', require('./api'));
 
-server.get('/', (req, res) => {
-  res.redirect('/docs');
-});
+// server.get('/', (req, res) => {
+//   res.redirect('/docs');
+// });
 
 // 404 handler
 server.get('*', (req, res) => {

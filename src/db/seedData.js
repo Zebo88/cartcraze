@@ -24,7 +24,7 @@ async function createTables() {
 
     await  client.query(`
       CREATE TABLE users(
-        id  SERIAL PRIMARY KEY, 
+        user_id  SERIAL PRIMARY KEY, 
         email VARCHAR(255) UNIQUE NOT NULL,
         username VARCHAR(255) UNIQUE NOT NULL, 
         password VARCHAR(255) NOT NULL,
@@ -42,7 +42,7 @@ async function createTables() {
 
     await  client.query(`
       CREATE TABLE products(
-        id SERIAL PRIMARY KEY, 
+        product_id SERIAL PRIMARY KEY, 
         title VARCHAR(255) UNIQUE NOT NULL,
         price NUMERIC (5, 2) NOT NULL,
         category VARCHAR(255) NOT NULL,
@@ -55,32 +55,44 @@ async function createTables() {
 
     await  client.query(`
       CREATE TABLE carts(
-        id SERIAL PRIMARY KEY, 
-        "userId" INTEGER REFERENCES users(id),
+        cart_id SERIAL PRIMARY KEY, 
+        user_id INTEGER REFERENCES users(user_id),
         date DATE NOT NULL
       );
     `)
 
     await  client.query(`
-      CREATE TABLE cartProducts (
-        id SERIAL PRIMARY KEY,
-        cart_id INTEGER REFERENCES carts(id),
-        product_id INTEGER REFERENCES products(id),
+      CREATE TABLE cart_products (
+        cart_product_id SERIAL PRIMARY KEY,
+        cart_id INTEGER REFERENCES carts(cart_id),
+        product_id INTEGER REFERENCES products(product_id),
         quantity INTEGER NOT NULL
       );
     `)
+
+    await client.query(`
+      CREATE TABLE orders (
+        order_id SERIAL PRIMARY KEY,
+        user_id INT REFERENCES users(user_id),
+        order_date DATE DEFAULT CURRENT_DATE
+      );
+    `)
+
+    await client.query(`
+      CREATE TABLE order_items (
+        order_item_id SERIAL PRIMARY KEY,
+        order_id INT REFERENCES orders(order_id),
+        product_id INT REFERENCES products(product_id),
+        quantity INT NOT NULL
+      );
+    `)
+
     console.log("Finished building tables!");
   } catch (error) {
     console.error("Error building tables!");
     throw error;
   }
 }
-
-/* 
-
-DO NOT CHANGE ANYTHING BELOW. This is default seed data, and will help you start testing, before getting to the tests. 
-
-*/
 
 async function createInitialUsers() {
   console.log('Starting to create users...');
@@ -352,6 +364,39 @@ async function createInitialCartsAndProducts() {
   }
 }
 
+async function createInitialOrdersAndItems() {
+  try {
+    console.log('Starting to create orders and order items...');
+
+    // Dummy orders data
+    const ordersToCreate = [
+      { userId: 1, orderDate: '2024-03-01' },
+      { userId: 2, orderDate: '2024-03-02' },
+      { userId: 3, orderDate: '2024-03-03' }
+    ];
+
+    // Insert orders into the database
+    const orders = await Promise.all(ordersToCreate.map(order => createOrder(order)));
+
+    // Dummy order items data
+    const orderItemsToCreate = [
+      { orderId: 1, productId: 1, quantity: 2 },
+      { orderId: 1, productId: 2, quantity: 1 },
+      { orderId: 2, productId: 3, quantity: 3 },
+      { orderId: 2, productId: 4, quantity: 2 },
+      { orderId: 3, productId: 5, quantity: 1 }
+    ];
+
+    // Insert order items into the database
+    await Promise.all(orderItemsToCreate.map(orderItem => createOrderItem(orderItem)));
+
+    console.log('Orders and Order Items Created.');
+    console.log('Finished creating orders and order items.');
+  } catch (error) {
+    throw error;
+  }
+}
+
 async function rebuildDB() {
   try {
     client.connect();
@@ -360,6 +405,7 @@ async function rebuildDB() {
     await createInitialUsers();
     await createInitialProducts();
     await createInitialCartsAndProducts();
+    await createInitialOrdersAndItems();
   } catch (error) {
     console.log('Error during rebuildDB')
     throw error;
