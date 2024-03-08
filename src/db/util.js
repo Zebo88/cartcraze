@@ -14,7 +14,6 @@ function dbFields(fields) {
   return {insert, select, vals};
 }
 
-
-module.exports = {
-  dbFields,
-}
+export {
+  dbFields
+};

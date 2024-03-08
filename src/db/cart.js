@@ -1,51 +1,75 @@
-const client = require('./client');
+import client from './client.js';
 
 
-async function createCart({ userId, date }) {
+async function getCurrentDate() {
+  return new Date().toISOString().split('T')[0]; // Returns a date string in the format 'YYYY-MM-DD'
+}
+
+async function createCart(userId) {
   try {
-      const { rows } = await client.query(`
-          INSERT INTO carts(user_id, date)
-          VALUES ($1, $2)
-          RETURNING *;
-      `, [userId, date]);
-      return rows[0];
+    // Retrieve the current date
+    const currentDate = await getCurrentDate();
+    
+    // Check if currentDate is valid
+    if (!currentDate || !userId) {
+      throw new Error('Failed to get the current date');
+    }
+
+    const { rows } = await client.query(`
+      INSERT INTO carts(user_id, date)
+      VALUES ($1, $2)
+      RETURNING *;
+    `, [userId, currentDate]);
+
+    return rows[0];
   } catch (error) {
-      throw error;
+    throw new Error(`Error creating cart: ${error.message}`);
   }
 }
 
 async function getCartByUserId(userId) {
   try {
-      const { rows } = await client.query(`
-          SELECT * FROM carts WHERE user_id = $1;
-      `, [userId]);
+    const { rows: cartRows } = await client.query(`
+      SELECT * FROM carts WHERE user_id = $1;
+    `, [userId]);
 
-      if (rows.length === 0) {
-          return null; // Return null if no cart is found
-      }
+    if (cartRows.length === 0) {
+      return null; // Return null if no cart is found
+    }
 
-      return rows[0]; // Return the first cart found (assuming there's only one per user)
+    const cart = cartRows[0]; // Retrieve the first cart found (the user will only have one cart that will be cleaned out when an order is placed)
+
+    // Retrieve cart products associated with the cart
+    const { rows: cartProductRows } = await client.query(`
+      SELECT * FROM cart_products WHERE cart_id = $1;
+    `, [cart.cart_id]);
+
+    cart.products = cartProductRows; // Add cart products to the cart object
+
+    return cart;
   } catch (error) {
-      throw error;
+    throw error;
   }
 }
 
-async function updateCart({ cartId, ...fields }) {
-  try {
-      const setFields = Object.keys(fields).map((key, index) => `"${key}"=$${index + 2}`).join(', ');
-      const values = Object.values(fields);
-      values.push(cartId);
-      const { rows } = await client.query(`
-          UPDATE carts
-          SET ${setFields}
-          WHERE cart_id = $1
-          RETURNING *;
-      `, values);
-      return rows[0];
-  } catch (error) {
-      throw error;
-  }
-}
+// async function updateCart({ cartId, ...fields }) {
+//   try {
+//       const setFields = Object.keys(fields).map((key, index) => `"${key}"=$${index + 2}`).join(', ');
+//       const values = Object.values(fields);
+//       values.push(cartId);
+//       const { rows } = await client.query(`
+//           UPDATE carts
+//           SET ${setFields}
+//           WHERE cart_id = $1
+//           RETURNING *;
+//       `, values);
+//       return rows[0];
+//   } catch (error) {
+//       throw error;
+//   }
+// }
+// FUNCTION NOT NECESSARY: the only thing we are doing with the cart is creating one, getting one, and deleting one. 
+// KEEPING IN CASE I WANT IT LATER.
 
 async function deleteCart(cartId) {
   try {
@@ -60,9 +84,9 @@ async function deleteCart(cartId) {
   }
 }
 
-module.exports = {
+export {
+  getCurrentDate,
   createCart,
   getCartByUserId,
-  updateCart,
   deleteCart
-}
+};

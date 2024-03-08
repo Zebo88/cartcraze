@@ -1,4 +1,4 @@
-const client = require('./client');
+import client from './client.js';
 
 // Define the function to create a cart product
 async function createCartProduct({ cartId, productId, quantity }) {
@@ -35,26 +35,84 @@ async function getCartProductsByCartId(cartId) {
 }
 
 // Define the function to update a cart product
-async function updateCartProduct({ id, ...fieldsToUpdate }) {
+// async function updateCartProduct({ id, ...fieldsToUpdate }) {
+//   try {
+//     const toUpdate = {};
+//     for (let column in fieldsToUpdate) {
+//       if (fieldsToUpdate[column] !== undefined) toUpdate[column] = fieldsToUpdate[column];
+//     }
+
+//     let cartProduct;
+//     if (Object.keys(toUpdate).length > 0) {
+//       const { rows } = await client.query(`
+//         UPDATE cart_products
+//         SET ${util.dbFields(toUpdate).insert}
+//         WHERE cart_product_id = ${id}
+//         RETURNING *;
+//       `, Object.values(toUpdate));
+//       cartProduct = rows[0];
+//     }
+//     return cartProduct;
+//   } catch (error) {
+//     throw error;
+//   }
+// } // DECIDED TO GO WITH A MORE SIMPLIFIED APPROACH TO UPDATING. KEEPING IN CASE I WANT IT LATER.
+
+async function updateCartProduct({ cartId, productId, quantity }) {
   try {
-    const toUpdate = {};
-    for (let column in fieldsToUpdate) {
-      if (fieldsToUpdate[column] !== undefined) toUpdate[column] = fieldsToUpdate[column];
+    // Check if productId and quantity are provided
+    if (productId === undefined || quantity === undefined) {
+      throw new Error('productId and quantity are required for updating cart');
     }
 
-    let cartProduct;
-    if (Object.keys(toUpdate).length > 0) {
-      const { rows } = await client.query(`
-        UPDATE cart_products
-        SET ${util.dbFields(toUpdate).insert}
-        WHERE cart_product_id = ${id}
-        RETURNING *;
-      `, Object.values(toUpdate));
-      cartProduct = rows[0];
-    }
-    return cartProduct;
+    // Update the quantity of the specified product in the cart
+    const query = `
+      UPDATE cart_products
+      SET quantity = $1
+      WHERE cart_id = $2 AND product_id = $3
+    `;
+    await client.query(query, [quantity, cartId, productId]);
+
+    // Return success message or updated cart data
+    return { message: 'Cart updated successfully' };
   } catch (error) {
     throw error;
+  }
+}
+
+// Function to clear all products from the cart
+async function clearCart(cartId) {
+  try {
+    await client.query(`
+      DELETE FROM cart_products
+      WHERE cart_id = $1;
+    `, [cartId]);
+  } catch (error) {
+    throw new Error(`Error clearing cart: ${error.message}`);
+  }
+}
+
+// Function to add a product to the cart
+async function addProductToCart(cartId, productId, quantity) {
+  try {
+    await client.query(`
+      INSERT INTO cart_products(cart_id, product_id, quantity)
+      VALUES ($1, $2, $3);
+    `, [cartId, productId, quantity]);
+  } catch (error) {
+    throw new Error(`Error adding product to cart: ${error.message}`);
+  }
+}
+
+// Function to remove a product from the cart
+async function removeProductFromCart(cartProductId) {
+  try {
+    await client.query(`
+      DELETE FROM cart_products
+      WHERE cart_product_id = $1;
+    `, [cartProductId]);
+  } catch (error) {
+    throw new Error(`Error removing product from cart: ${error.message}`);
   }
 }
 
@@ -80,9 +138,12 @@ async function deleteCartProduct(id) {
   }
 }
 
-module.exports = {
+export {
   createCartProduct,
   getCartProductsByCartId,
   updateCartProduct,
+  clearCart,
+  addProductToCart,
+  removeProductFromCart,
   deleteCartProduct
 };

@@ -1,15 +1,15 @@
-const express = require('express');
+import express from 'express';
+import { requireUser } from './util.js';
+import { createProduct, getProductById, getAllProducts, searchProducts, updateProduct, deleteProduct } from '../db/products.js';
+
 const router = express.Router();
-const { requireUser } = require('./util');
-const { createProduct, getProductById, getAllProducts, searchProducts, updateProduct, deleteProduct } = require('../db/product');
 
 
-// POST /api/products - Create a new product
-router.post('/', requireUser, async (req, res, next) => {
+// GET /api/products - Get all products
+router.get('/', async (req, res, next) => {
   try {
-    const { name, description, price, category } = req.body;
-    const newProduct = await createProduct({ name, description, price, category });
-    res.status(201).json(newProduct);
+    const products = await getAllProducts();
+    res.json(products);
   } catch (error) {
     next(error);
   }
@@ -29,15 +29,6 @@ router.get('/:productId', async (req, res, next) => {
   }
 });
 
-// GET /api/products - Get all products
-router.get('/', async (req, res, next) => {
-  try {
-    const products = await getAllProducts();
-    res.json(products);
-  } catch (error) {
-    next(error);
-  }
-});
 
 // POST /api/products/search - Search products
 router.post('/search', async (req, res, next) => {
@@ -45,6 +36,17 @@ router.post('/search', async (req, res, next) => {
     const { searchTerm } = req.body;
     const searchResults = await searchProducts(searchTerm);
     res.json(searchResults);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// POST /api/products - Create a new product
+router.post('/', requireUser, async (req, res, next) => {
+  try {
+    const { name, description, price, category } = req.body;
+    const newProduct = await createProduct({ name, description, price, category });
+    res.status(201).json(newProduct);
   } catch (error) {
     next(error);
   }
@@ -72,4 +74,4 @@ router.delete('/:productId', requireUser, async (req, res, next) => {
   }
 });
 
-module.exports = router;
+export default router;

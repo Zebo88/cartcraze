@@ -1,5 +1,5 @@
-const client = require('./client');
-const bcrypt = require('bcrypt');
+import client from './client.js';
+import bcrypt from 'bcrypt';
 const SALT_COUNT = 10;
 
 
@@ -104,9 +104,9 @@ async function getUserByUsername(userName) {
   }
 }
 
-module.exports = {
+export {
   createUser,
   getUser,
   getUserById,
-  getUserByUsername,
-}
+  getUserByUsername
+};

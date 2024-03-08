@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "seed:dev": "nodemon ./db/seed.js",
-    "seed": "node ./db/seed.js",
+    "seed:dev": "nodemon ./src/db/seed.js",
+    "seed": "node ./src/db/seed.js",
     "start:dev": "nodemon index.js",
     "start": "node index.js",
     "build": "vite build",

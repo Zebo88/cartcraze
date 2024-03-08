@@ -1,6 +1,8 @@
-module.exports = {
-  ...require('./user'), // adds key/values from users.js
-  ...require('./cart'), // adds key/values from carts.js
-  ...require('./products'), // adds key/values from products.js
-  ...require('./cart_products') // adds key/values from products.js
-}
+// Import individual exports from user.js, cart.js, products.js, and cart_products.js
+import * as user from './user.js';
+import * as cart from './cart.js';
+import * as products from './products.js';
+import * as cart_products from './cart_products.js';
+
+// Export all the imported exports
+export { user, cart, products, cart_products };

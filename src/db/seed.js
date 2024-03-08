@@ -1,5 +1,5 @@
-const client = require('./client');
-const { rebuildDB, testDB } = require('./seedData');
+import client from './client.js';
+import { rebuildDB } from './seedData.js';
 
 rebuildDB()
   .catch(console.error)

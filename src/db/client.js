@@ -1,4 +1,5 @@
-const { Client } = require('pg');
+import pkg from 'pg';
+const { Client } = pkg;
 
 const connectionString = process.env.DATABASE_URL || 'https://localhost:5432/cartcraze_db';
 
@@ -7,4 +8,4 @@ const client = new Client({
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
 });
 
-module.exports = client;
+export default client;

@@ -1,4 +1,4 @@
-const client = require('./client');
+import client from './client.js';
 
 
 async function createProduct({ title, price, category, description, image, rate, count }) {
@@ -104,11 +104,10 @@ async function deleteProduct(productId) {
     }
 }
 
-module.exports = {
-    createProduct,
-    getProductById,
-    getAllProducts,
-    searchProducts,
-    updateProduct,
-    deleteProduct
-};
+export { 
+  createProduct,
+  getProductById,
+  getAllProducts,
+  searchProducts,
+  updateProduct,
+  deleteProduct };

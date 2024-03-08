@@ -1,15 +1,21 @@
-// require in the database adapter functions as you write them (createUser, createActivity...)
-const { createUser, createProduct, createCart, createCartProduct } = require('./');
-const client = require('./client');
+// Import the database adapter functions as you write them (createUser, createProduct...)
+import { createUser } from './user.js';
+import { createProduct } from './products.js';
+import { createCart } from './cart.js';
+import { createCartProduct } from './cart_products.js';
+import { createOrder, createOrderItem } from './orders.js';
+import client from './client.js';
 
 async function dropTables() {
   console.log('Dropping All Tables...');
   // drop all tables, in the correct order
   try {
     await  client.query(`
-    DROP TABLE IF EXISTS cartproducts;
-    DROP TABLE IF EXISTS carts;
-    DROP TABLE IF EXISTS products;
+    DROP TABLE IF EXISTS order_items CASCADE;
+    DROP TABLE IF EXISTS orders CASCADE;
+    DROP TABLE IF EXISTS cartproducts CASCADE;
+    DROP TABLE IF EXISTS carts CASCADE;
+    DROP TABLE IF EXISTS products CASCADE;
     DROP TABLE IF EXISTS users;
   `)
   } catch (error) {
@@ -56,7 +62,7 @@ async function createTables() {
     await  client.query(`
       CREATE TABLE carts(
         cart_id SERIAL PRIMARY KEY, 
-        user_id INTEGER REFERENCES users(user_id),
+        user_id INTEGER NOT NULL REFERENCES users(user_id),
         date DATE NOT NULL
       );
     `)
@@ -64,8 +70,8 @@ async function createTables() {
     await  client.query(`
       CREATE TABLE cart_products (
         cart_product_id SERIAL PRIMARY KEY,
-        cart_id INTEGER REFERENCES carts(cart_id),
-        product_id INTEGER REFERENCES products(product_id),
+        cart_id INTEGER NOT NULL REFERENCES carts(cart_id),
+        product_id INTEGER NOT NULL REFERENCES products(product_id),
         quantity INTEGER NOT NULL
       );
     `)
@@ -73,16 +79,16 @@ async function createTables() {
     await client.query(`
       CREATE TABLE orders (
         order_id SERIAL PRIMARY KEY,
-        user_id INT REFERENCES users(user_id),
-        order_date DATE DEFAULT CURRENT_DATE
+        user_id INT NOT NULL REFERENCES users(user_id),
+        order_date DATE NOT NULL DEFAULT CURRENT_DATE
       );
     `)
 
     await client.query(`
       CREATE TABLE order_items (
         order_item_id SERIAL PRIMARY KEY,
-        order_id INT REFERENCES orders(order_id),
-        product_id INT REFERENCES products(product_id),
+        order_id INT NOT NULL REFERENCES orders(order_id),
+        product_id INT NOT NULL REFERENCES products(product_id),
         quantity INT NOT NULL
       );
     `)
@@ -397,7 +403,7 @@ async function createInitialOrdersAndItems() {
   }
 }
 
-async function rebuildDB() {
+export async function rebuildDB() {
   try {
     client.connect();
     await dropTables();
@@ -412,6 +418,3 @@ async function rebuildDB() {
   }
 }
 
-module.exports = {
-  rebuildDB
-};

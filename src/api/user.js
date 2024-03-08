@@ -1,19 +1,21 @@
-const express = require('express');
+import express from 'express';
+import jwt from 'jsonwebtoken';
+import { createUser, getUserById, getUser } from '../db/user.js';
+import { requireUser } from './util.js';
+
 const router = express.Router();
-const jwt = require('jsonwebtoken');
-const { createUser, getUserById, getUser } = require('../db');
-const { requireUser } = require('./util');
-const JWT_SECRET = process.env.JWT_SECRET;
 
+// secret key
+const JWT_SECRET = 'yankees3DJtheCap';
 
-// POST /api/login
+// POST /api/user/login
 router.post('/login', async (req, res, next) => {
   const { username, password } = req.body;
 
   // Check if both username and password are provided
   if (!username || !password) {
-    return next({
-      name: 'MissingCredentialsError',
+    return res.status(400).json({
+      error: 'MissingCredentialsError',
       message: 'Please supply both a username and password'
     });
   }
@@ -24,14 +26,17 @@ router.post('/login', async (req, res, next) => {
 
     // If user does not exist or password is incorrect, return an error
     if (!user) {
-      return next({
-        name: 'IncorrectCredentialsError',
+      return res.status(401).json({
+        error: 'IncorrectCredentialsError',
         message: 'Username or password is incorrect',
       });
     }
 
     // Generate JWT token for authentication
-    const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '1w' });
+    const token = jwt.sign({ id: user.user_id, username: user.username }, JWT_SECRET, { expiresIn: '1w' });
+
+    // Set req.user to the retrieved user object
+    req.user = user;
 
     // Send successful response with user data and token
     res.status(200).json({ user, message: "You're logged in!", token });
@@ -40,7 +45,7 @@ router.post('/login', async (req, res, next) => {
   }
 });
 
-// POST /api/register
+// POST /api/user/register
 router.post('/register', async (req, res) => {
   try {
     // Extract user data from the request body
@@ -53,6 +58,9 @@ router.post('/register', async (req, res) => {
 
     // Call the createUser function to create the user
     const newUser = await createUser({ email, username, password, firstname, lastname, housenum, street, city, state, country, zipcode, phone });
+
+    // Set req.user to the retrieved user object
+    req.user = newUser;
 
     // Send a success response with the newly created user data
     res.status(201).json({ user: newUser, message: 'User created successfully' });
@@ -75,10 +83,33 @@ router.get('/:userId', requireUser, async (req, res) => {
       return res.status(404).json({ error: 'User not found' }); // Return a 404 error if the user is not found
     }
     res.json(user); // Return the user data in the response
+    req.user = user; //set the user
   } catch (error) {
     console.error('Error fetching user by ID:', error);
     res.status(500).json({ error: 'Internal server error' }); // Return a 500 error for internal server errors
   }
 });
 
-module.exports = router;
+// POST /api/user/logout - Log out the user
+router.post('/logout', (req, res) => {
+  try {
+    // Check if the user is logged in
+    if (!req.user) {
+      return res.status(401).json({
+        error: 'Unauthorized',
+        message: 'You must be logged in to log out'
+      });
+    }
+
+    // Remove the user information from the request object
+    delete req.user;
+
+    // Send a success response
+    res.json({ message: 'You have been successfully logged out' });
+  } catch (error) {
+    console.error('Error logging out user:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+export default router;
