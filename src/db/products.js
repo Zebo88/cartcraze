@@ -56,9 +56,49 @@ async function searchProducts(searchTerm) {
         OR description LIKE '%' || $1 || '%';
     `;
     const { rows } = await client.query(query, [searchTerm]);
-    return rows;
+
+    if (rows.length > 0) {
+      return rows; // Return the results
+    } else {
+        throw new Error("No Results");
+    }
+
   } catch (error) {
     throw error;
+  }
+}
+
+// Function to fetch all product categories from the database
+async function getProductCategories() {
+  try {
+    // SQL query
+    const sql = 'SELECT DISTINCT category FROM products';
+
+    // Execute the query and await the result
+    const result = await client.query(sql);
+
+    // Extract the categories from the query result
+    const categories = result.rows.map(row => row.category);
+
+    return categories;
+  } catch (error) {
+    // Handle any errors that occur during the database operation
+    throw new Error(`Error fetching product categories: ${error.message}`);
+  }
+}
+
+// Function to fetch products by category from the database
+async function getProductsByCategory(category) {
+  try {
+    const query = `
+      SELECT * FROM products
+      WHERE category = $1
+    `;
+    const { rows } = await client.query(query, [category]);
+
+    return rows;
+  } catch (error) {
+    throw new Error(`Error fetching products of category ${category}: ${error.message}`);
   }
 }
 
@@ -109,5 +149,7 @@ export {
   getProductById,
   getAllProducts,
   searchProducts,
+  getProductCategories,
+  getProductsByCategory,
   updateProduct,
   deleteProduct };

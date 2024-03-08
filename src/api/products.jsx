@@ -1,5 +1,5 @@
 
-const API_URL = 'https://fakestoreapi.com/products';
+const API_URL = 'http://localhost:3000/api/products';
 
 // Get all the products from the API
 export async function getAllProducts(){

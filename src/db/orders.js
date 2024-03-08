@@ -61,12 +61,18 @@ async function createOrderItem(orderItemData) {
 async function getOrdersByUserId(userId) {
   try {
     const query = `
-      SELECT orders.*, order_items.*
+      SELECT DISTINCT ON (orders.order_id) orders.*, order_items.*
       FROM orders
       LEFT JOIN order_items ON orders.order_id = order_items.order_id
       WHERE orders.user_id = $1;
     `;
     const { rows } = await client.query(query, [userId]);
+    
+    // Check if there are no orders
+    if (rows.length === 0) {
+      return null;
+    }
+    
     return rows;
   } catch (error) {
     throw new Error(`Error fetching orders for user ID ${userId}: ${error.message}`);
@@ -108,36 +114,36 @@ async function getOrderItemsByOrderId(orderId) {
   }
 }
 
-async function getOrderHistoryWithItemsByUserId(userId) {
-  try {
-      const orders = await getOrdersByUserId(userId);
-      const ordersWithItems = [];
+// async function getOrderHistoryWithItemsByUserId(userId) {
+//   try {
+//       const orders = await getOrdersByUserId(userId);
+//       const ordersWithItems = [];
 
-      for (const order of orders) {
-          const orderItems = await getOrderItemsByOrderId(order.order_id);
-          const itemsWithProducts = [];
+//       for (const order of orders) {
+//           const orderItems = await getOrderItemsByOrderId(order.order_id);
+//           const itemsWithProducts = [];
 
-          for (const orderItem of orderItems) {
-              const product = await getProductById(orderItem.product_id);
-              const itemWithProduct = {
-                  ...orderItem,
-                  product: product
-              };
-              itemsWithProducts.push(itemWithProduct);
-          }
+//           for (const orderItem of orderItems) {
+//               const product = await getProductById(orderItem.product_id);
+//               const itemWithProduct = {
+//                   ...orderItem,
+//                   product: product
+//               };
+//               itemsWithProducts.push(itemWithProduct);
+//           }
 
-          const orderWithItems = {
-              ...order,
-              items: itemsWithProducts
-          };
-          ordersWithItems.push(orderWithItems);
-      }
+//           const orderWithItems = {
+//               ...order,
+//               items: itemsWithProducts
+//           };
+//           ordersWithItems.push(orderWithItems);
+//       }
 
-      return ordersWithItems;
-  } catch (error) {
-      throw new Error(`Error fetching order history for user ID ${userId}: ${error.message}`);
-  }
-}
+//       return ordersWithItems;
+//   } catch (error) {
+//       throw new Error(`Error fetching order history for user ID ${userId}: ${error.message}`);
+//   }
+// }  // FUNCTION NOT NEEDED, BUT KEEPING IN CASE I WANT IT FOR SOMETHING LATER.
 
 export {
   getCurrentDate,
@@ -145,6 +151,5 @@ export {
   createOrderItem,
   getOrdersByUserId,
   getSingleOrderByUserId,
-  getOrderItemsByOrderId,
-  getOrderHistoryWithItemsByUserId
+  getOrderItemsByOrderId
 };

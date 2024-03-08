@@ -1,7 +1,8 @@
 import express from 'express';
-import { createCart, getCartByUserId, deleteCart } from '../db/cart.js';
+import { createCart, getCartByUserId, getCartItemsByCartId, deleteCart } from '../db/cart.js';
 import { updateCartProduct } from '../db/cart_products.js';
 import { addProductToCart, clearCart, removeProductFromCart } from '../db/cart_products.js';
+import { getProductById } from '../db/products.js';
 import { requireUser } from './util.js';
 
 const router = express.Router();
@@ -20,16 +21,53 @@ router.post('/', requireUser, async (req, res, next) => {
 
 // GET /api/cart/user/:userId - Get cart by user ID
 router.get('/user/:userId', requireUser, async (req, res, next) => {
-    try {
-        const { userId } = req.params;
-        const cart = await getCartByUserId(userId);
-        if (!cart) {
-            return res.status(404).json({ message: 'Cart not found' });
-        }
-        res.json(cart);
-    } catch (error) {
-        next(error);
-    }
+  try {
+      const { userId } = req.params;
+      const cart = await getCartByUserId(userId);
+      
+      if (!cart) {
+          return res.status(404).json({ message: 'Cart not found' });
+      }
+
+      // Retrieve cart items for the current cart
+      const cartItems = await getCartItemsByCartId(cart.cart_id);
+
+      // Initialize an array to store cart items with product details
+      const cartItemsWithProducts = [];
+
+      // Loop through cart items
+      for (const item of cartItems) {
+          // Retrieve product details for the current item
+          const product = await getProductById(item.product_id);
+
+          // Add detailed product information to the cart item
+          const cartItemWithProduct = {
+              product_id: item.product_id,
+              title: product.title,
+              price: product.price,
+              category: product.category,
+              description: product.description,
+              image: product.image,
+              rate: product.rate,
+              count: product.count,
+              quantity: item.quantity,
+          };
+
+          // Add the cart item with product details to the array
+          cartItemsWithProducts.push(cartItemWithProduct);
+      }
+
+      // Construct the response object
+      const cartWithItems = {
+          cart_id: cart.cart_id,
+          user_id: cart.user_id,
+          products: cartItemsWithProducts
+      };
+
+      res.json(cartWithItems);
+  } catch (error) {
+      next(error);
+  }
 });
 
 // POST /api/cart/:userId - Add a product and quantity to the cart with ID

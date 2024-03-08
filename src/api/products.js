@@ -1,6 +1,6 @@
 import express from 'express';
 import { requireUser } from './util.js';
-import { createProduct, getProductById, getAllProducts, searchProducts, updateProduct, deleteProduct } from '../db/products.js';
+import { createProduct, getProductById, getAllProducts, searchProducts, getProductCategories, getProductsByCategory, updateProduct, deleteProduct } from '../db/products.js';
 
 const router = express.Router();
 
@@ -9,6 +9,33 @@ const router = express.Router();
 router.get('/', async (req, res, next) => {
   try {
     const products = await getAllProducts();
+    res.json(products);
+  } catch (error) {
+    next(error);
+  }
+});
+
+//GET /api/products/categories - Get a list of categories from the products table
+router.get('/categories', async (req, res) => {
+  try {
+    // Call the function to fetch product categories
+    const categories = await getProductCategories();
+
+    // Send the categories as a response
+    res.json(categories);
+  } catch (error) {
+    // Handle errors
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// GET /api/products/category/:category - Get all products of a specific category
+router.get('/category/:category', async (req, res, next) => {
+  try {
+    const { category } = req.params;
+    // Add your logic here to fetch products of the specified category
+    const products = await getProductsByCategory(category);
     res.json(products);
   } catch (error) {
     next(error);
@@ -28,7 +55,6 @@ router.get('/:productId', async (req, res, next) => {
     next(error);
   }
 });
-
 
 // POST /api/products/search - Search products
 router.post('/search', async (req, res, next) => {

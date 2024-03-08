@@ -29,26 +29,31 @@ async function createCart(userId) {
 
 async function getCartByUserId(userId) {
   try {
-    const { rows: cartRows } = await client.query(`
-      SELECT * FROM carts WHERE user_id = $1;
-    `, [userId]);
+      const { rows: cartRows } = await client.query(
+          `SELECT * FROM carts WHERE user_id = $1;`,
+          [userId]
+      );
 
-    if (cartRows.length === 0) {
-      return null; // Return null if no cart is found
-    }
+      if (cartRows.length === 0) {
+          return null; // Return null if no cart is found
+      }
 
-    const cart = cartRows[0]; // Retrieve the first cart found (the user will only have one cart that will be cleaned out when an order is placed)
-
-    // Retrieve cart products associated with the cart
-    const { rows: cartProductRows } = await client.query(`
-      SELECT * FROM cart_products WHERE cart_id = $1;
-    `, [cart.cart_id]);
-
-    cart.products = cartProductRows; // Add cart products to the cart object
-
-    return cart;
+      return cartRows[0]; // Retrieve the first cart found
   } catch (error) {
-    throw error;
+      throw error;
+  }
+}
+
+async function getCartItemsByCartId(cartId) {
+  try {
+      const query = `
+          SELECT * FROM cart_products
+          WHERE cart_id = $1;
+      `;
+      const { rows } = await client.query(query, [cartId]);
+      return rows;
+  } catch (error) {
+    throw new Error(`Error fetching cart items for cart ID ${cartId}: ${error.message}`);
   }
 }
 
@@ -88,5 +93,6 @@ export {
   getCurrentDate,
   createCart,
   getCartByUserId,
+  getCartItemsByCartId,
   deleteCart
 };
