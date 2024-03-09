@@ -28,42 +28,6 @@ export async function getSingleProduct(productId){
   }
 }
 
-// Limit the results of the products to 5
-export async function getLimitedProducts(){
-  try {
-    const response = await fetch(`${API_URL}?$limit=5`);
-    const result = await response.json();
-    
-    return result;
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-// Sort the products in descending order
-export async function getSortedProductsDesc(){
-  try {
-    const response = await fetch(`${API_URL}?sort=desc`);
-    const result = await response.json();
-    
-    return result;
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-// Sort the products in acending order
-export async function getSortedProductsAsc(){
-  try {
-    const response = await fetch(`${API_URL}?sort=asc`);
-    const result = await response.json();
-    
-    return result;
-  } catch (error) {
-    console.error(error);
-  }
-}
-
 // Get all the product categories
 export async function getProductCategories(){
   try {
@@ -88,58 +52,60 @@ export async function getProductsOfCategory(category){
   }
 }
 
+// ADMINISTRATOR FUNCTIONS BELOW. If I have time, I will implement them.
+
 // Add a new product
-export async function addProduct(title, price, description, image, category){
-  try {
-    const response = await fetch(API_URL,{
-      method: 'POST',
-      body: JSON.stringify({
-        title,
-        price,
-        description,
-        image,
-        category
-      })
-    });
-    const result = await response.json();
+// export async function addProduct(title, price, description, image, category){
+//   try {
+//     const response = await fetch(API_URL,{
+//       method: 'POST',
+//       body: JSON.stringify({
+//         title,
+//         price,
+//         description,
+//         image,
+//         category
+//       })
+//     });
+//     const result = await response.json();
     
-    return result;
-  } catch (error) {
-    console.error(error);
-  }
-}
+//     return result;
+//   } catch (error) {
+//     console.error(error);
+//   }
+// }
 
-// Update a product
-export async function updateProduct(productId, title, price, description, image, category){
-  try {
-    const response = await fetch(`${API_URL}/${productId}`,{
-      method: 'PATCH',
-      body: JSON.stringify({
-        title,
-        price,
-        description,
-        image,
-        category
-      })
-    });
-    const result = await response.json();
+// // Update a product
+// export async function updateProduct(productId, title, price, description, image, category){
+//   try {
+//     const response = await fetch(`${API_URL}/${productId}`,{
+//       method: 'PATCH',
+//       body: JSON.stringify({
+//         title,
+//         price,
+//         description,
+//         image,
+//         category
+//       })
+//     });
+//     const result = await response.json();
     
-    return result;
-  } catch (error) {
-    console.error(error);
-  }
-}
+//     return result;
+//   } catch (error) {
+//     console.error(error);
+//   }
+// }
 
-// Delete a product
-export async function deleteProduct(productId){
-  try {
-    const response = await fetch(`${API_URL}/${productId}`,{
-      method: 'DELETE'
-    });
-    const result = await response.json();
+// // Delete a product
+// export async function deleteProduct(productId){
+//   try {
+//     const response = await fetch(`${API_URL}/${productId}`,{
+//       method: 'DELETE'
+//     });
+//     const result = await response.json();
     
-    return result;
-  } catch (error) {
-    console.error(error);
-  }
-}
+//     return result;
+//   } catch (error) {
+//     console.error(error);
+//   }
+// }

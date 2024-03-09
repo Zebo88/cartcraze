@@ -1,6 +1,6 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
-import { createUser, getUserById, getUser } from '../db/user.js';
+import { createUser, getUserById, getUser, updateUser } from '../db/user.js';
 import { requireUser } from './util.js';
 
 const router = express.Router();
@@ -109,6 +109,21 @@ router.post('/logout', (req, res) => {
   } catch (error) {
     console.error('Error logging out user:', error);
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// PATCH /api/user/update/:userId - Update user information
+router.patch('/update/:userId', async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const userData = req.body; // User data to update sent in the request body
+
+    // Call the updateUser function to update user information
+    const updatedUser = await updateUser(userId, userData);
+    
+    res.json(updatedUser);
+  } catch (error) {
+    next(error);
   }
 });
 

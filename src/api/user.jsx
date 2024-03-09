@@ -1,70 +1,35 @@
 
-const API_URL = 'https://fakestoreapi.com/users';
+const API_URL = 'http://localhost:3000/api/user';
 
-// Get all users
-export async function getAllUsers(){
+
+// User Login Function
+export async function login(username, password){
   try {
-    const response = await fetch(API_URL);
+    const response = await fetch(`${API_URL}/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        username,
+        password
+      })
+    });
+
     const result = await response.json();
+    console.log(result);
 
     return result;
   } catch (error) {
     console.log(error);
-  }
-}
-
-// Get single user
-export async function getSingleUser(userId){
-  try {
-    const response = await fetch(`${API_URL}/${userId}`);
-    const result = await response.json();
-
-    return result;
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-// Get limited users
-export async function getLimitedUsers(){
-  try {
-    const response = await fetch(`${API_URL}?limit=5`);
-    const result = await response.json();
-
-    return result;
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-// Get sorted ascending users (The default value is in ascending mode, you can use it with 'desc' or 'asc' as you want.)
-export async function getSortedAscUsers(){
-  try {
-    const response = await fetch(`${API_URL}?sort=asc`);
-    const result = await response.json();
-
-    return result;
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-// Get sorted descending users
-export async function getSortedDescUsers(){
-  try {
-    const response = await fetch(`${API_URL}?sort=desc`);
-    const result = await response.json();
-
-    return result;
-  } catch (error) {
-    console.log(error);
+    return "Unable to login! Please try again.";
   }
 }
 
 // Add a new user
-export async function addUser(email, username, password, name, address, phone){
+export async function addUser(email, username, password, firstname, lastname, housenum, street, city, state, country, zipcode, phone){
   try {
-    const response = await fetch(API_URL,{
+    const response = await fetch(`${API_URL}/register`,{
       method: 'POST',
       headers: {
         "Content-Type": "application/json"
@@ -73,8 +38,14 @@ export async function addUser(email, username, password, name, address, phone){
         email, 
         username, 
         password, 
-        name, 
-        address, 
+        firstname, 
+        lastname, 
+        housenum, 
+        street, 
+        city, 
+        state, 
+        country, 
+        zipcode, 
         phone
       })
     });
@@ -87,17 +58,24 @@ export async function addUser(email, username, password, name, address, phone){
   }
 }
 
-// Update a user
-export async function updateUser(userId, email, username, password, name, address, phone){
+// Update a user with ID
+export async function updateUser(email, username, currentPassword, newPassword, firstname, lastname, housenum, street, city, state, country, zipcode, phone){
   try {
-    const response = await fetch(`${API_URL}/${userId}`,{
+    const response = await fetch(`${API_URL}/update/${userId}`,{
       method: 'PATCH',
       body: JSON.stringify({
         email, 
-        username, 
-        password, 
-        name, 
-        address, 
+        username,
+        currentPassword,
+        newPassword, 
+        firstname, 
+        lastname, 
+        housenum, 
+        street, 
+        city, 
+        state, 
+        country, 
+        zipcode, 
         phone
       })
     });
@@ -121,4 +99,66 @@ export async function deleteUser(userId){
   } catch (error) {
     console.error(error);
   }
-}
+} // I will implement this if I have time.
+
+// ADMINISTRATOR FUNCTIONS BELOW. I will implement them if I have time.
+
+// // Get all users
+// export async function getAllUsers(){
+//   try {
+//     const response = await fetch(API_URL);
+//     const result = await response.json();
+
+//     return result;
+//   } catch (error) {
+//     console.log(error);
+//   }
+// }
+
+// // Get single user
+// export async function getSingleUser(userId){
+//   try {
+//     const response = await fetch(`${API_URL}/${userId}`);
+//     const result = await response.json();
+
+//     return result;
+//   } catch (error) {
+//     console.log(error);
+//   }
+// }
+
+// // Get limited users
+// export async function getLimitedUsers(){
+//   try {
+//     const response = await fetch(`${API_URL}?limit=5`);
+//     const result = await response.json();
+
+//     return result;
+//   } catch (error) {
+//     console.log(error);
+//   }
+// }
+
+// // Get sorted ascending users (The default value is in ascending mode, you can use it with 'desc' or 'asc' as you want.)
+// export async function getSortedAscUsers(){
+//   try {
+//     const response = await fetch(`${API_URL}?sort=asc`);
+//     const result = await response.json();
+
+//     return result;
+//   } catch (error) {
+//     console.log(error);
+//   }
+// }
+
+// // Get sorted descending users
+// export async function getSortedDescUsers(){
+//   try {
+//     const response = await fetch(`${API_URL}?sort=desc`);
+//     const result = await response.json();
+
+//     return result;
+//   } catch (error) {
+//     console.log(error);
+//   }
+// }

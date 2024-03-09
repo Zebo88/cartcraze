@@ -65,7 +65,7 @@ async function getUser({ username, password }) {
   }
 }
 
-async function getUserById(userId) {
+async function getUserById(userId, isPWRequired) {
   // first get the user
   try {
     const {rows: [user]} = await client.query(`
@@ -76,9 +76,13 @@ async function getUserById(userId) {
     // if it doesn't exist, return null
     if (!user) return null;
     // if it does:
-    // delete the 'password' key from the returned object
-    delete user.password; 
-    return user;  
+    if(isPWRequired){
+      return user;
+    }else{
+      // delete the 'password' key from the returned object
+      delete user.password; 
+      return user; 
+    }
   } catch (error) {
     throw error;
   }
@@ -104,9 +108,64 @@ async function getUserByUsername(userName) {
   }
 }
 
+async function updateUser(userId, userData) {
+  try {
+    const isPWRequired = true; // creating this field for the getUserById() so that the user returned contains the password.
+    // Retrieve the user from the database to get the current password
+    const user = await getUserById(userId, isPWRequired);
+
+    // If the userData object contains a new password, update it
+    if (userData.password) {
+      // Compare the provided current password with the hashed password stored in the database
+      const isPasswordCorrect = await bcrypt.compare(userData.currentPassword, user.password);
+
+      if (!isPasswordCorrect) {
+        throw new Error('Current password is incorrect');
+      }
+
+      // Hash and salt the new password
+      const hashedPassword = await bcrypt.hash(userData.password, SALT_COUNT);
+      userData.password = hashedPassword;
+    }
+
+    // Construct the UPDATE query dynamically based on provided fields
+    const updateFields = [];
+    const values = [];
+
+    let placeholderIndex = 1; // Start index for placeholders
+
+    Object.keys(userData).forEach((key) => {
+      if (key !== 'currentPassword') {
+        updateFields.push(`${key} = $${placeholderIndex}`);
+        values.push(userData[key]);
+        placeholderIndex++; // Increment the index for the next placeholder
+      }
+    });
+
+    // Add userId to the end of the values array
+    values.push(userId);
+
+    // Construct the UPDATE query
+    const query = `
+      UPDATE users
+      SET ${updateFields.join(', ')}
+      WHERE user_id = $${values.length}
+      RETURNING *;
+    `;
+
+    // Execute the UPDATE query
+    const { rows } = await client.query(query, values);
+
+    return rows[0]; // Return the updated user
+  } catch (error) {
+    throw new Error(`Error updating user: ${error.message}`);
+  }
+}
+
 export {
   createUser,
   getUser,
   getUserById,
-  getUserByUsername
+  getUserByUsername,
+  updateUser
 };
