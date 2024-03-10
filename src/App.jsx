@@ -16,21 +16,35 @@ import Checkout from './components/checkout'
 
 
 function App() {
-  const [token, setToken] = useState(null);
+  const [token, setToken] = useState(() => {
+    const storedToken = localStorage.getItem('token');
+    return storedToken ? JSON.parse(storedToken) : null;
+  });
   const [searchInput, setSearchInput] = useState("");
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem('user');
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
   const [products, setProducts] = useState([]);
   const [singleProduct, setSingleProduct] = useState(null);
   const [singleProductId, setSingleProductId] = useState(() => {
     const storedProductId = localStorage.getItem('singleProductId');
-    return storedProductId ? storedProductId : null;
+    return storedProductId ? JSON.parse(storedProductId) : null;
   });
   const [quantity, setQuantity] = useState(1);
   const [recentlyViewed, setRecentlyViewed] = useState(() => {
     const storedRecentlyViewed = localStorage.getItem('recentlyViewed');
     return storedRecentlyViewed ? JSON.parse(storedRecentlyViewed) : [];
   });
+  // const [cart, setCart] = useState(() => {
+  //   const storedCart = localStorage.getItem('cart');
+  //   return storedCart ? JSON.parse(storedCart) : [];
+  // });
   const [cart, setCart] = useState([]);
+  const [orderHistory, setOrderHistory] = useState(() => {
+    const history = localStorage.getItem('order-history');
+    return history ? JSON.parse(history) : [];
+  });
   let cartArr = [];
 
   return (
@@ -42,6 +56,7 @@ function App() {
             token={token}
             searchInput={searchInput}
             setSearchInput={setSearchInput}
+            setProducts={setProducts}
           />
         </div>
       
@@ -65,6 +80,7 @@ function App() {
           />
           <Route path='/products/:id' element={<SingleProduct
               token={token}
+              setToken={setToken}
               singleProduct={singleProduct}
               setSingleProduct={setSingleProduct}
               singleProductId={singleProductId}
@@ -76,6 +92,7 @@ function App() {
               cart={cart}
               setCart={setCart}
               cartArr={cartArr}
+              setUser={setUser}
             />}
           />
           <Route path='/account' element={<Account
@@ -83,6 +100,8 @@ function App() {
               setToken={setToken}
               user={user}
               setUser={setUser}
+              orderHistory={orderHistory}
+              setOrderHistory={setOrderHistory}
             />}
           />
           <Route path='/login' element={<Login
@@ -106,9 +125,13 @@ function App() {
               setCart={setCart}
               cartArr={cartArr}
               token={token}
+              setToken={setToken}
+              user={user}
+              setUser={setUser}
             />}
           />
           <Route path='/checkout' element={<Checkout
+              user={user}
               token={token}
               cart={cart}
               setCart={setCart}

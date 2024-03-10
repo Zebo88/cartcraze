@@ -10,7 +10,7 @@ import Row from 'react-bootstrap/Row';
 import jewelryAd from '../images/jewelryAdNarrow.jpg'
 import hatAd from '../images/hatAdNarrow.jpg'
 import earbudsAd from '../images/earbudsAdNarrow.jpg'
-import { getAllProducts, getProductsOfCategory } from "../api/products";
+import { getAllProducts, getProductsOfCategory } from "../api/products.jsx";
 import Category from "./category";
 import Alert from 'react-bootstrap/Alert';
 
@@ -21,10 +21,13 @@ export default function Home({ products, setProducts, singleProduct, setSinglePr
   useEffect(() => {
     async function fetchProducts() {
       try {
-        if(category === ""){
+        if(category === "" && products.length === 0){
           const allProducts = await getAllProducts();
           setProducts(allProducts);
-        }else{
+        }else if(category === "All Categories"){
+          const allProducts = await getAllProducts();
+          setProducts(allProducts);
+        }else if(category !== ""){
           const categoryProducts = await getProductsOfCategory(category);
           setProducts(categoryProducts);
         }
@@ -64,7 +67,7 @@ export default function Home({ products, setProducts, singleProduct, setSinglePr
 
       <div className="container category-container">
         <Category setCategory={setCategory}/>
-        { category && <div className="category-pill">{capitalizeWords(category)}<h6 className="x" onClick={()=>{setCategory("")}} >x</h6></div>}
+        { category && <div className="category-pill">{capitalizeWords(category)}<h6 className="x" onClick={()=>{setCategory(""); setProducts([])}} >x</h6></div>}
 
       </div>
 
@@ -72,37 +75,8 @@ export default function Home({ products, setProducts, singleProduct, setSinglePr
   {category ? <h3>{capitalizeWords(category)}</h3> : <h3>All Products</h3>}
   <CardGroup>
     <Row xs={2} sm={2} md={3} lg={4} xl={5} className="g-4">
-      {products &&
-        (products.filter((product) => {
-          const searchLower = searchInput.toLowerCase();
-          const titleLower = product.title.toLowerCase();
-          const descriptionLower = product.description.toLowerCase();
-          const categoryLower = product.category.toLowerCase();
-
-          // Check if title, description, or category includes the search input
-          return (
-            categoryLower.includes(searchLower) ||
-            titleLower.includes(searchLower) ||
-            descriptionLower.includes(searchLower)
-          );
-        }).length === 0 ? (
-          <Alert variant="danger" style={{width:"300px", margin:"60px 0"}}>No results! Try again.</Alert>
-        ) : (
-          products
-            .filter((product) => {
-              const searchLower = searchInput.toLowerCase();
-              const titleLower = product.title.toLowerCase();
-              const descriptionLower = product.description.toLowerCase();
-              const categoryLower = product.category.toLowerCase();
-
-              // Check if title, description, or category includes the search input
-              return (
-                categoryLower.includes(searchLower) ||
-                titleLower.includes(searchLower) ||
-                descriptionLower.includes(searchLower)
-              );
-            })
-            .map((product, idx) => (
+      {products[0] ?
+            products.map((product, idx) => (
               <Col key={idx} style={{ minWidth: '200px', maxWidth: 'none' }}>
                 <Card style={{ height: '30rem', boxShadow: '2px 2px 10px 0 rgba(0, 0, 0, 0.1)' }}>
                 <Card.Img 
@@ -111,20 +85,20 @@ export default function Home({ products, setProducts, singleProduct, setSinglePr
                     src={product.image} 
                     style={{ height:"15rem", objectFit:"contain", padding:"10px" }} 
                     onClick={()=>{
-                      setSingleProductId(product.id); 
-                      localStorage.setItem('singleProductId', singleProductId);
+                      setSingleProductId(product.product_id); 
+                      localStorage.setItem('singleProductId', product.product_id);
                       setRecentlyViewed(recentlyViewed => [...recentlyViewed, product]);
-                      navigate(`/products/:${product.id}`)
+                      navigate(`/products/:${product.product_id}`)
                       }
                   }/>
                   <Card.Body>
                     <Card.Title 
                       className="card-title" 
                       onClick={()=>{
-                        setSingleProductId(product.id); 
-                        localStorage.setItem('singleProductId', singleProductId);
+                        setSingleProductId(product.product_id); 
+                        localStorage.setItem('singleProductId', product.product_id);
                         setRecentlyViewed(recentlyViewed => [...recentlyViewed, product]);
-                        navigate(`/products/:${product.id}`)
+                        navigate(`/products/:${product.product_id}`)
                         }
                       }>{ product.title.length > 50 ?
                         `${product.title.slice(0,50)}...`
@@ -133,14 +107,16 @@ export default function Home({ products, setProducts, singleProduct, setSinglePr
                       }
                     </Card.Title>
                     <div className="rating-container">
-                      Rating: {<Rating rate={product.rating.rate} />} {product.rating.rate}
+                      Rating: {<Rating rate={product.rate} />} {product.rate}
                     </div>
-                    <Card.Text style={{ fontSize:"15pt" }}>${product.price.toFixed(2)}</Card.Text>
+                    <Card.Text style={{ fontSize:"15pt" }}>${product.price}</Card.Text>
                   </Card.Body>
                 </Card>
               </Col>
             ))
-        ))}
+      :
+      <Alert variant="danger" style={{width:"300px", margin:"60px 0"}}>No results! Try again.</Alert>
+      }
     </Row>
   </CardGroup>
 </div>

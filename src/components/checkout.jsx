@@ -4,9 +4,10 @@ import { Container, Row, Col, Alert } from "react-bootstrap";
 import Card from 'react-bootstrap/Card';
 import Form from 'react-bootstrap/Form';
 import { Button, FormLabel } from "react-bootstrap";
+import { purchaseItems } from '../api/orders.jsx'
 
 
-export default function Checkout({ token, cart, setCart }){
+export default function Checkout({ user, token, cart, setCart }){
   const [name, setName] = useState("");
   const [cardNum, setCardNum] = useState("");
   const [expDate, setExpDate] = useState("");
@@ -65,10 +66,12 @@ export default function Checkout({ token, cart, setCart }){
     let totalQuantity = 0;
     let totalPrice = 0;
 
-    cartArray.forEach(item => {
-      totalQuantity += item.quantity;
-      totalPrice += item.price * item.quantity;
-    });
+    if (cartArray && cartArray.products) {
+      cartArray.products.forEach(item => {
+        totalQuantity += item.quantity;
+        totalPrice += item.price * item.quantity;
+      });
+    }
 
     setSubtotalQuantity(totalQuantity);
     setSubtotalPrice(totalPrice);
@@ -177,31 +180,32 @@ export default function Checkout({ token, cart, setCart }){
       return;
     }
 
-    // Retrieve existing order history from local storage
-const existingOrderHistory = localStorage.getItem("order-history");
-const previousOrders = existingOrderHistory ? JSON.parse(existingOrderHistory) : [];
+//     // Retrieve existing order history from local storage
+// const existingOrderHistory = localStorage.getItem("order-history");
+// const previousOrders = existingOrderHistory ? JSON.parse(existingOrderHistory) : [];
 
-// Get the current date and time
-const currentDate = new Date();
-const timestamp = currentDate.toLocaleString();
+// // Get the current date and time
+// const currentDate = new Date();
+// const timestamp = currentDate.toLocaleString();
 
-// Create a new order object with the cart items and the timestamp
-const newOrder = {
-  date: timestamp,
-  items: cart
-};
+// // Create a new order object with the cart items and the timestamp
+// const newOrder = {
+//   date: timestamp,
+//   items: cart
+// };
 
-// Append the new order to the existing order history
-const updatedOrderHistory = [...previousOrders, newOrder];
+// // Append the new order to the existing order history
+// const updatedOrderHistory = [...previousOrders, newOrder];
 
-// Store the updated order history back into local storage
-localStorage.setItem("order-history", JSON.stringify(updatedOrderHistory));
+// // Store the updated order history back into local storage
+// localStorage.setItem("order-history", JSON.stringify(updatedOrderHistory));
 
     // Clear the general error message if form is valid
     setGeneralError(""); 
     // Clear cart from localStorage
     if(formIsValid){
       localStorage.removeItem("cart");
+      purchaseItems(user.user_id, token);
     }
     // Your checkout logic here
     navigate('/');
@@ -210,7 +214,7 @@ localStorage.setItem("order-history", JSON.stringify(updatedOrderHistory));
   return(
     <Container className="checkout-container">
       <h3>Checkout</h3>
-      <Link  onClick={() => {navigate(-1)}} className="back-link">{`< Back to Cart`}</Link>
+      <Link  to="/cart" className="back-link">{`< Back to Cart`}</Link>
       <br />
       <Card style={{padding:"20px"}}>
       <Card.Title>{`Order Details (${subtotalQuantity} Items)`}</Card.Title>
@@ -433,7 +437,7 @@ localStorage.setItem("order-history", JSON.stringify(updatedOrderHistory));
               <Card.Title style={{fontSize:"18pt"}}>Order Summary</Card.Title>
               <hr />
               <div className="summary-container">
-                {cart.map((item, index) => (
+                {cart && cart.products && cart.products.map((item, index) => (
                     <div className="order-summary" key={index}>
                       <p>{`${item.title} (${item.quantity}):`}</p>
                       <p>${(item.price * item.quantity).toFixed(2)}</p>

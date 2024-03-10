@@ -2,12 +2,12 @@ import React from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Alert from 'react-bootstrap/Alert';
-import { login } from "../api/login";
+import { login } from "../api/user.jsx";
 import Registration from "./registration";
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 
-export default function Login({ token, setToken, setAccountData }){
+export default function Login({ token, setToken, setAccountData, user, setUser }){
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState(null);
@@ -22,13 +22,16 @@ export default function Login({ token, setToken, setAccountData }){
         setMessage("Please enter a username AND password!");
         return;
       }
-      const response = await login(username, password);    
-
+      const response = await login(username, password);   
+      
       if(response.token){
         setToken(response.token);
+        setUser(response);
+        localStorage.setItem("user", JSON.stringify(response.user));
+        localStorage.setItem("token", JSON.stringify(response.token));
         navigate('/');
       }else{
-        throw new Error(response);
+        throw new Error(response.message);
       }
 
     } catch (error) {

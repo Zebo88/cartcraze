@@ -11,7 +11,7 @@ export default function Category({ setCategory }){
 
           <Dropdown.Menu>
           <Dropdown.Item onClick={() => {
-                setCategory("")
+                setCategory("All Categories")
               }}>
                 All Categories
             </Dropdown.Item>
@@ -23,9 +23,9 @@ export default function Category({ setCategory }){
                 Electronics
             </Dropdown.Item>
             <Dropdown.Item onClick={() => {
-                setCategory("jewelery")
+                setCategory("jewelry")
               }}>
-                Jewelery
+                Jewelry
             </Dropdown.Item>
             <Dropdown.Item onClick={() => {
                 setCategory("men's clothing")

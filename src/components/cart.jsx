@@ -8,15 +8,15 @@ import Form from 'react-bootstrap/Form';
 import Alert from 'react-bootstrap/Alert';
 import { Button, FormLabel } from "react-bootstrap";
 import { useNavigate, Link } from "react-router-dom";
-import { getSingleCart, updateCart } from "../api/cart";
-import { getSingleProduct } from "../api/products";
-import Rating from "./rating";
-import CartLogo from '../images/CartLogo.jpeg'
-import { faHourglass1 } from "@fortawesome/free-solid-svg-icons";
-import Footer from "./footer";
+import { getAllCartsForUser, updateProductQuantityInCart, deleteSingleItemFromCart } from "../api/cart.jsx";
+// import { getSingleProduct } from "../api/products.jsx";
+// import Rating from "./rating";
+// import CartLogo from '../images/CartLogo.jpeg'
+// import { faHourglass1 } from "@fortawesome/free-solid-svg-icons";
+// import Footer from "./footer";
 
 
-export default function Cart({ quantity, setQuantity, cart, setCart, cartArr, token }){
+export default function Cart({ quantity, setQuantity, cart, setCart, cartArr, token, setToken, user, setUser }){
   const navigate = useNavigate();
   const [subtotalQuantity, setSubtotalQuantity] = useState(0);
   const [subtotalPrice, setSubtotalPrice] = useState(0);
@@ -28,16 +28,26 @@ export default function Cart({ quantity, setQuantity, cart, setCart, cartArr, to
   useEffect(() => {
     async function getCartItems() {
       try {
-        // Retrieve the current cart array from local storage
-        const cartFromLocalStorage = localStorage.getItem("cart");
-        // Parse the cart array from JSON format to JavaScript array
-        const cartArray = cartFromLocalStorage ? JSON.parse(cartFromLocalStorage) : [];
-        // Set cart to the cartArray variable
-        setCart(cartArray);
+        // Retrieve the user object from local storage
+        const userFromLocalStorage = localStorage.getItem("user");
+        const userObject = userFromLocalStorage ? JSON.parse(userFromLocalStorage) : null;
 
-        // Set the subtotal and item counts for the cart
-        calculateSubtotal(cart);
+        // Retrieve the user object from local storage
+        const tokenFromLocalStorage = localStorage.getItem("token");
+        const tokenObject = userFromLocalStorage ? JSON.parse(tokenFromLocalStorage) : null;
+  
+        // Set the user state
+        setUser(userObject);
 
+        //Set the token state
+        setToken(tokenObject);
+  
+        // Fetch order history only if the user is available
+        if (userObject && token) {
+          const response = await getAllCartsForUser(userObject.user_id, token);
+          localStorage.setItem('cart', JSON.stringify(response));
+          setCart(response);
+        }
       } catch (error) {
         console.error(error);
       }
@@ -45,23 +55,27 @@ export default function Cart({ quantity, setQuantity, cart, setCart, cartArr, to
 
     getCartItems();   
 
-  },[]);
+  },[cart]);
 
   async function handleDelete(itemId){
 
     try {
+      const productId = itemId;
       // Retrieve the current cart array from localStorage
       const cartFromLocalStorage = localStorage.getItem("cart");
       // Parse the cart array from JSON format to JavaScript array
       const cartArray = cartFromLocalStorage ? JSON.parse(cartFromLocalStorage) : [];
   
       // Filter out the item with the specified ID
-      const updatedCart = cartArray.filter(item => item.id !== itemId);
-  
+      const updatedCart = cartArray.products.filter(item => item.product_id !== itemId);
+      
       // Update localStorage with the new cart array
       localStorage.setItem("cart", JSON.stringify(updatedCart));
-  
-      // Optionally, update state if your component relies on it
+
+      const response = await deleteSingleItemFromCart(updatedCart.cart_id, productId, token)
+      console.log(response);
+
+      // Update state
       setCart(updatedCart);
 
       // Recalculate subtotal and item quantities
@@ -73,25 +87,32 @@ export default function Cart({ quantity, setQuantity, cart, setCart, cartArr, to
     }
   }
 
-  function updateQuantity(itemId, quantityChange) {
+  async function updateQuantity(itemId, quantityChange, quantity) {
     try {
-      const updatedCart = cart.map(item => {
-        if (item.id === itemId) {
+      let updatedCart = cart.products.map(item => {
+        if (item.product_id === itemId) {
           // Calculate the new quantity
-          const newQuantity = item.quantity + quantityChange;
+          let newQuantity = quantity + quantityChange;
           // Ensure that the new quantity is at least 1
-          const updatedQuantity = Math.max(newQuantity, 1);
-          return { ...item, quantity: updatedQuantity };
+          newQuantity = Math.max(newQuantity, 1);
+          
+          // Update the quantity in the database
+          updateProductQuantityInCart(cart.cart_id, itemId, newQuantity, token)
+            .then(() => console.log('Quantity updated successfully'))
+            .catch(error => console.error('Error updating quantity:', error));
+  
+          return { ...item, quantity: newQuantity };
         }
         return item;
       });
-
+  
       // Update localStorage with the updated cart
       localStorage.setItem("cart", JSON.stringify(updatedCart));
-
+  
       // Update state with the updated cart
       setCart(updatedCart);
-
+  
+      // Recalculate subtotal and item quantities
       calculateSubtotal(updatedCart);
     } catch (error) {
       console.error("Error updating quantity:", error);
@@ -102,17 +123,19 @@ export default function Cart({ quantity, setQuantity, cart, setCart, cartArr, to
     let totalQuantity = 0;
     let totalPrice = 0;
 
-    cartArray.forEach(item => {
-      totalQuantity += item.quantity;
-      totalPrice += item.price * item.quantity;
-    });
+    if(cartArray.products)(
+      cartArray.products.forEach(item => {
+        totalQuantity += item.quantity;
+        totalPrice += item.price * item.quantity;
+      })
+    )
 
     setSubtotalQuantity(totalQuantity);
     setSubtotalPrice(totalPrice);
   }
 
   function handleSubmit(){
-    if(cart[0]){
+    if(cart.products[0]){
       navigate('/checkout')
     }else{
       return;
@@ -132,7 +155,7 @@ export default function Cart({ quantity, setQuantity, cart, setCart, cartArr, to
 
           <hr />
           
-          {cart[0] ? cart.map((item, idx) => (
+          {cart.products?.length > 0 ? cart.products.map((item, idx) => (
             <Row key={idx} className="g-4">
               <Col>
                 <Card style={{ border: "none", height: "auto", margin: "0 20px" }}>
@@ -158,7 +181,7 @@ export default function Cart({ quantity, setQuantity, cart, setCart, cartArr, to
                                 className="counter-btn"
                                 size="sm"
                                 variant="outline-secondary"
-                                onClick={() => updateQuantity(item.id, -1)}
+                                onClick={() => updateQuantity(item.product_id, -1, item.quantity)}
                               >-</Button>
                             </div>
                             <div className="counter-items">{item.quantity}</div>
@@ -167,7 +190,7 @@ export default function Cart({ quantity, setQuantity, cart, setCart, cartArr, to
                                 className="counter-btn"
                                 size="sm"
                                 variant="outline-secondary"
-                                onClick={() => updateQuantity(item.id, 1)}
+                                onClick={() => updateQuantity(item.product_id, 1, item.quantity)}
                               >+</Button>
                             </div>
                           </div>
@@ -177,7 +200,7 @@ export default function Cart({ quantity, setQuantity, cart, setCart, cartArr, to
                             className="deleteFromCart-btn"
                             size="sm"
                             style={{ width: "80px", marginTop:"10px" }}
-                            onClick={() => { handleDelete(item.id) }}
+                            onClick={() => { handleDelete(item.product_id) }}
                           >
                             Delete
                           </Button>

@@ -1,5 +1,4 @@
 import {useEffect, useState } from "react";
-import { getSingleProduct } from "../api/products";
 import Rating from './rating';
 import { Carousel } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
@@ -8,10 +7,11 @@ import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import { Container } from "react-bootstrap";
 import { Link, useNavigate } from 'react-router-dom';
-import { getProductsOfCategory } from "../api/products";
+import { getSingleProduct, getProductsOfCategory } from "../api/products.jsx";
+import { addProductToCart, getAllCartsForUser } from "../api/cart.jsx"
 
 
-export default function SingleProduct({ token, singleProduct, setSingleProduct, singleProductId, setSingleProductId, quantity, setQuantity, recentlyViewed, setRecentlyViewed, cart, setCart, cartArr }){
+export default function SingleProduct({ token, setToken, singleProduct, setSingleProduct, singleProductId, setSingleProductId, quantity, setQuantity, recentlyViewed, setRecentlyViewed, cart, setCart, cartArr, setUser }){
   const navigate = useNavigate();
   const [cat, setCat] = useState(null);
   const [similarItems, setSimilarItems] = useState(() => {
@@ -64,7 +64,7 @@ export default function SingleProduct({ token, singleProduct, setSingleProduct, 
             // Fetch similar items based on the category
             const categoryProducts = await getProductsOfCategory(product.category);
             // Filter out the current product from the similar items list
-            const filteredSimilarItems = categoryProducts.filter(item => item.id !== singleProductId);
+            const filteredSimilarItems = categoryProducts.filter(item => item.product_id !== singleProductId);
             setSimilarItems(filteredSimilarItems);
           }
         }
@@ -110,35 +110,60 @@ export default function SingleProduct({ token, singleProduct, setSingleProduct, 
 
   function addToRecentlyViewed(item) {
     // Add the item to recently viewed if it's not already present
-    if (!recentlyViewed.find(viewedItem => viewedItem.id === item.id)) {
+    if (!recentlyViewed.find(viewedItem => viewedItem.product_id === item.product_id)) {
       setRecentlyViewed([...recentlyViewed, item]);
       // Update local storage with the updated recently viewed items
       localStorage.setItem('recentlyViewed', JSON.stringify([...recentlyViewed, item]));
     }
   }
 
-  function addToCartHandler() {
+  async function addToCartHandler() {
     try {
+      // Retrieve the user object from local storage
+      const userFromLocalStorage = localStorage.getItem("user");
+      const userObject = userFromLocalStorage ? JSON.parse(userFromLocalStorage) : null;
+
+      // Retrieve the user object from local storage
+      const tokenFromLocalStorage = localStorage.getItem("token");
+      const tokenObject = userFromLocalStorage ? JSON.parse(tokenFromLocalStorage) : null;
+
+      // Set the user state
+      setUser(userObject);
+
+      //Set the token state
+      setToken(tokenObject);
+
+      // Add the item to the cart
+      const response = await addProductToCart(userObject.user_id, singleProduct.product_id, quantity, tokenObject);
+      console.log(response);
+
+      // Get the cart items
+      const resp = await getAllCartsForUser(userObject.user_id, tokenObject);
+      console.log(resp);
+
       // Retrieve the current cart array from local storage
       const cartFromLocalStorage = localStorage.getItem("cart");
   
       // Parse the cart array from JSON format to JavaScript array
       const cartArray = cartFromLocalStorage ? JSON.parse(cartFromLocalStorage) : [];
-  
-      // Check if the product already exists in the cart
-      const existingProductIndex = cartArray.findIndex(item => item.id === singleProduct.id);
-  
-      if (existingProductIndex !== -1) {
-        // If the product exists, update its quantity
-        cartArray[existingProductIndex].quantity += 1;
-      } else {
-        // If the product does not exist, add it to the cart with a quantity of 1
-        const productWithQuantity = { ...singleProduct, quantity };
-        cartArray.push(productWithQuantity);
+      
+      if(cartArray.products[0]){
+        // Check if the product already exists in the cart
+        const existingProductIndex = cartArray.products.findIndex(item => item.product_id === singleProduct.product_id);
+
+        if (existingProductIndex !== -1) {
+          // If the product exists, update its quantity
+          cartArray.products[existingProductIndex].quantity += 1;
+        } else {
+          // If the product does not exist, add it to the cart with a quantity of 1
+          const productWithQuantity = { ...singleProduct, quantity };
+          cartArray.products.push(productWithQuantity);
+        }
       }
-  
+
       // Store the updated cart array back to local storage
       localStorage.setItem("cart", JSON.stringify(cartArray));
+
   
       // Set cart to the cartArray variable and navigate to the cart
       setCart(cartArray);
@@ -169,7 +194,7 @@ export default function SingleProduct({ token, singleProduct, setSingleProduct, 
             <Card style={{  border:"none"}}>
               <Row className="g-4" xs={1} lg={2}>
                 <Col lg="8">
-                <Link onClick={() => {navigate(-1)}} className="back-link">{"< Back"}</Link>
+                <Link to="/" className="back-link">{"< Back to Homepage"}</Link>
                 <br /><br />
                   <Card.Img 
                     className="card-title" 
@@ -183,10 +208,10 @@ export default function SingleProduct({ token, singleProduct, setSingleProduct, 
                     <br /><br />
                     <Card.Title className="card-title">{ singleProduct.title }</Card.Title>
                     <div className="rating-container">
-                      Rating: {<Rating rate={singleProduct.rating.rate} />} {singleProduct.rating.rate}
+                      Rating: {<Rating rate={singleProduct.rate} />} {singleProduct.rate}
                     </div>
                     <hr />
-                    <Card.Text style={{ fontSize:"15pt" }} className="price-text">{<strong>${singleProduct.price.toFixed(2)}</strong>}</Card.Text>
+                    <Card.Text style={{ fontSize:"15pt" }} className="price-text">{<strong>${singleProduct.price}</strong>}</Card.Text>
                     <div className="quantity-container">
                       <div className="counter">
                         <p className="counter-items">Quantity:</p>
@@ -252,16 +277,16 @@ export default function SingleProduct({ token, singleProduct, setSingleProduct, 
                               src={item.image}
                               style={{ height: "15rem", objectFit: "contain", padding: "10px" }}
                               onClick={() => { 
-                                setSingleProductId(item.id); 
-                                localStorage.setItem('singleProductId', item.id);
+                                setSingleProductId(item.product_id); 
+                                localStorage.setItem('singleProductId', item.product_id);
                                 // Check if the item is already in the recently viewed list
-                                if (!recentlyViewed.find(viewedItem => viewedItem.id === item.id)) {
+                                if (!recentlyViewed.find(viewedItem => viewedItem.product_id === item.product_id)) {
                                   // Add the item to the recently viewed list if it's not already present
                                   setRecentlyViewed(recentlyViewed => [...recentlyViewed, item]);
                                   // Update local storage with the updated recently viewed items
                                   localStorage.setItem('recentlyViewed', JSON.stringify([...recentlyViewed, item]));
                                 } 
-                                navigate(`/products/:${item.id}`) 
+                                navigate(`/products/:${item.product_id}`) 
                                 }
                               }
                             />
@@ -269,22 +294,22 @@ export default function SingleProduct({ token, singleProduct, setSingleProduct, 
                               <Card.Title 
                                 className="card-title" 
                                 onClick={() => { 
-                                  setSingleProductId(item.id); 
-                                  localStorage.setItem('singleProductId', item.id);
+                                  setSingleProductId(item.product_id); 
+                                  localStorage.setItem('singleProductId', item.product_id);
                                   // Check if the item is already in the recently viewed list
-                                  if (!recentlyViewed.find(viewedItem => viewedItem.id === item.id)) {
+                                  if (!recentlyViewed.find(viewedItem => viewedItem.product_id === item.product_id)) {
                                     // Add the item to the recently viewed list if it's not already present
                                     setRecentlyViewed(recentlyViewed => [...recentlyViewed, item]);
                                     // Update local storage with the updated recently viewed items
                                     localStorage.setItem('recentlyViewed', JSON.stringify([...recentlyViewed, item]));
                                   }  
-                                  navigate(`/products/:${item.id}`) 
+                                  navigate(`/products/:${item.product_id}`) 
                                   }
                                 }>
                                 {item.title.length > 50 ? `${item.title.slice(0, 50)}...` : item.title}
                               </Card.Title>
                               <div className="rating-container">
-                                Rating: {<Rating rate={item.rating.rate} />} {item.rating.rate}
+                                Rating: {<Rating rate={item.rate} />} {item.rate}
                               </div>
                               <Card.Text style={{ fontSize: "15pt" }}>${item.price}</Card.Text>
                             </Card.Body>
@@ -324,38 +349,38 @@ export default function SingleProduct({ token, singleProduct, setSingleProduct, 
                               src={item.image}
                               style={{ height: "15rem", objectFit: "contain", padding: "10px" }}
                               onClick={() => {
-                                setSingleProductId(item.id);
-                                localStorage.setItem('singleProductId', item.id);
+                                setSingleProductId(item.product_id);
+                                localStorage.setItem('singleProductId', item.product_id);
                                 // Check if the item is already in the recently viewed list
-                                if (!recentlyViewed.find(viewedItem => viewedItem.id === item.id)) {
+                                if (!recentlyViewed.find(viewedItem => viewedItem.product_id === item.product_id)) {
                                   // Add the item to the recently viewed list if it's not already present
                                   setRecentlyViewed(recentlyViewed => [...recentlyViewed, item]);
                                   // Update local storage with the updated recently viewed items
                                   localStorage.setItem('recentlyViewed', JSON.stringify([...recentlyViewed, item]));
                                 } 
-                                navigate(`/products/:${item.id}`);
+                                navigate(`/products/:${item.product_id}`);
                               }}
                             />
                             <Card.Body>
                               <Card.Title 
                                 className="card-title" 
                                 onClick={() => {
-                                  setSingleProductId(item.id);
-                                  localStorage.setItem('singleProductId', item.id);
+                                  setSingleProductId(item.product_id);
+                                  localStorage.setItem('singleProductId', item.product_id);
                                   // Check if the item is already in the recently viewed list
-                                  if (!recentlyViewed.find(viewedItem => viewedItem.id === item.id)) {
+                                  if (!recentlyViewed.find(viewedItem => viewedItem.product_id === item.product_id)) {
                                     // Add the item to the recently viewed list if it's not already present
                                     setRecentlyViewed(recentlyViewed => [...recentlyViewed, item]);
                                     // Update local storage with the updated recently viewed items
                                     localStorage.setItem('recentlyViewed', JSON.stringify([...recentlyViewed, item]));
                                   } 
-                                  navigate(`/products/:${item.id}`);
+                                  navigate(`/products/:${item.product_id}`);
                                 }}
                               >
                                 {item.title.length > 50 ? `${item.title.slice(0, 50)}...` : item.title}
                               </Card.Title>
                               <div className="rating-container">
-                                Rating: {<Rating rate={item.rating.rate} />} {item.rating.rate}
+                                Rating: {<Rating rate={item.rate} />} {item.rate}
                               </div>
                               <Card.Text style={{ fontSize: "15pt" }}>${item.price}</Card.Text>
                             </Card.Body>

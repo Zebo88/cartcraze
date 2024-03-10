@@ -14,9 +14,14 @@ export async function getAllCarts(){
 }
 
 // Get users' carts (ex: http://localhost:3000/api/user/2 will get all the carts for user #2)
-export async function getAllCartsForUser(userId){
+export async function getAllCartsForUser(userId, token){
   try {
-    const response = await fetch(`${API_URL}/user/${userId}`);
+    const response = await fetch(`${API_URL}/user/${userId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
     const result = await response.json();
 
     return result;
@@ -26,10 +31,14 @@ export async function getAllCartsForUser(userId){
 }
 
 // Add a new cart
-export async function addCart(userId){
+export async function addCart(userId, token){
   try {
     const response = await fetch(API_URL,{
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
       body: JSON.stringify({
         userId
       })
@@ -43,10 +52,14 @@ export async function addCart(userId){
 }
 
 // Add a product to the cart
-export async function addProductToCart(userId, productId, quantity){
+export async function addProductToCart(userId, productId, quantity, token){
   try {
     const response = await fetch(`${API_URL}/${userId}`,{
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
       body: JSON.stringify({
         productId,
         quantity
@@ -61,13 +74,17 @@ export async function addProductToCart(userId, productId, quantity){
 }
 
 // Update the quantity of product in cart
-export async function updateProductQuantityInCart(cartId, productId, quantity){
+export async function updateProductQuantityInCart(cartId, productId, updatedQuantity, token){
   try {
     const response = await fetch(`${API_URL}/${cartId}`,{
       method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
       body: JSON.stringify({
         productId,
-        quantity
+        quantity: updatedQuantity
       })
     });
     const result = await response.json();
@@ -79,10 +96,13 @@ export async function updateProductQuantityInCart(cartId, productId, quantity){
 }
 
 // Delete single item from the cart 
-export async function deleteSingleItemFromCart(cartId, productId){
+export async function deleteSingleItemFromCart(cartId, productId, token){
   try {
     const response = await fetch(`${API_URL}/${cartId}/remove/${productId}`,{
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
     });
     const result = await response.json();
     
@@ -93,10 +113,13 @@ export async function deleteSingleItemFromCart(cartId, productId){
 }
 
 // Delete ALL items from the cart
-export async function deleteAllItemsFromCart(cartId){
+export async function deleteAllItemsFromCart(cartId, token){
   try {
     const response = await fetch(`${API_URL}/${cartId}/clear`,{
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
     });
     const result = await response.json();
     

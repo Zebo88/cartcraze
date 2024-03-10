@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { searchProducts } from "../api/products.jsx";
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import Form from 'react-bootstrap/Form';
@@ -11,8 +12,26 @@ import { Container } from "react-bootstrap";
 import magnifyingGlass from "../images/magnifying-glass-solid.svg"
 import { Navigate, useNavigate } from "react-router-dom";
 
-export default function NavigationBar({ token, searchInput, setSearchInput }){
+export default function NavigationBar({ token, searchInput, setSearchInput, setProducts }){
   const navigate = useNavigate();
+
+  async function handleSubmit(e){
+    e.preventDefault();
+
+    try {
+      // Search DB for products using searchInput
+      const results = await searchProducts(searchInput);
+
+      // Set products state to results
+      setProducts(results);
+
+      // Navigate to the homepage when search is complete
+      navigate('/');
+      
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   return(
     <>
@@ -36,12 +55,12 @@ export default function NavigationBar({ token, searchInput, setSearchInput }){
             <Button
               variant="info"
               id="button-addon2"
-              onClick={() => navigate('/')}
+              onClick={ (e) => { handleSubmit(e) }}
               tabIndex={0} // Ensure the button is focusable
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault();
-                  navigate('/');
+                  handleSubmit(e);
                 }
               }}
             >

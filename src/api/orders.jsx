@@ -2,12 +2,12 @@
 const API_URL = 'http://localhost:3000/api/orders';
 
 // Function to create a new order
-export async function createOrder(userId) {
+export async function createOrder(userId, token) {
   try {
     const response = await fetch(`${API_URL}/orders/${userId}/create`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Authorization': `Bearer ${token}`
       }
     });
     const result = await response.json();
@@ -19,12 +19,12 @@ export async function createOrder(userId) {
 }
 
 // Function to get orders by user ID
-export async function getOrdersByUserId(userId) {
+export async function getOrdersByUserId(userId, token) {
   try {
-    const response = await fetch(`${API_URL}/orders/user/${userId}`, {
+    const response = await fetch(`${API_URL}/user/${userId}`, {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json'
+        'Authorization': `Bearer ${token}`
       }
     });
     const result = await response.json();
@@ -38,10 +38,10 @@ export async function getOrdersByUserId(userId) {
 // Function to get a single order with ID for a user with ID
 export async function getSingleOrderByUserId(userId, orderId) {
   try {
-    const response = await fetch(`${API_URL}/orders/${orderId}/users/${userId}`, {
+    const response = await fetch(`${API_URL}/${orderId}/users/${userId}`, {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json'
+        'Authorization': `Bearer ${token}`
       }
     });
     const result = await response.json();
@@ -53,12 +53,13 @@ export async function getSingleOrderByUserId(userId, orderId) {
 }
 
 // Function to add item to an order
-export async function addItemToOrder(orderId, productId, quantity) {
+export async function addItemToOrder(orderId, productId, quantity, token) {
   try {
-    const response = await fetch(`${API_URL}/orders/${orderId}/add`, {
+    const response = await fetch(`${API_URL}/${orderId}/add`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify({ productId, quantity })
     });
@@ -71,12 +72,12 @@ export async function addItemToOrder(orderId, productId, quantity) {
 }
 
 // Function to create order using items from the cart
-export async function purchaseItems(userId) {
+export async function purchaseItems(userId, token) {
   try {
-    const response = await fetch(`${API_URL}/orders/user/${userId}/purchase`, {
+    const response = await fetch(`${API_URL}/user/${userId}/purchase`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Authorization': `Bearer ${token}`
       }
     });
     const result = await response.json();

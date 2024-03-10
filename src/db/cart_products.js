@@ -95,10 +95,27 @@ async function clearCart(cartId) {
 // Function to add a product to the cart
 async function addProductToCart(cartId, productId, quantity) {
   try {
-    await client.query(`
-      INSERT INTO cart_products(cart_id, product_id, quantity)
-      VALUES ($1, $2, $3);
-    `, [cartId, productId, quantity]);
+    // Check if the product already exists in the cart
+    const existingProduct = await client.query(`
+      SELECT * FROM cart_products
+      WHERE cart_id = $1 AND product_id = $2;
+    `, [cartId, productId]);
+
+    if (existingProduct.rows.length > 0) {
+      // If the product exists, update its quantity
+      const newQuantity = existingProduct.rows[0].quantity + quantity;
+      await client.query(`
+        UPDATE cart_products
+        SET quantity = $1
+        WHERE cart_id = $2 AND product_id = $3;
+      `, [newQuantity, cartId, productId]);
+    } else {
+      // If the product does not exist, add it to the cart
+      await client.query(`
+        INSERT INTO cart_products(cart_id, product_id, quantity)
+        VALUES ($1, $2, $3);
+      `, [cartId, productId, quantity]);
+    }
   } catch (error) {
     throw new Error(`Error adding product to cart: ${error.message}`);
   }
@@ -109,7 +126,7 @@ async function removeProductFromCart(cartProductId) {
   try {
     await client.query(`
       DELETE FROM cart_products
-      WHERE cart_product_id = $1;
+      WHERE product_id = $1;
     `, [cartProductId]);
   } catch (error) {
     throw new Error(`Error removing product from cart: ${error.message}`);
