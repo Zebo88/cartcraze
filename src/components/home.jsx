@@ -12,6 +12,7 @@ import hatAd from '../images/hatAdNarrow.jpg'
 import earbudsAd from '../images/earbudsAdNarrow.jpg'
 import { getAllProducts, getProductsOfCategory } from "../api/products.jsx";
 import Category from "./category";
+import Filter from "./filter.jsx"
 import Alert from 'react-bootstrap/Alert';
 
 export default function Home({ products, setProducts, singleProduct, setSingleProduct, singleProductId, setSingleProductId, recentlyViewed, setRecentlyViewed, searchInput }){
@@ -68,7 +69,7 @@ export default function Home({ products, setProducts, singleProduct, setSinglePr
       <div className="container category-container">
         <Category setCategory={setCategory}/>
         { category && <div className="category-pill">{capitalizeWords(category)}<h6 className="x" onClick={()=>{setCategory(""); setProducts([])}} >x</h6></div>}
-
+        <Filter setProducts={setProducts}/>
       </div>
 
       <div className="container">

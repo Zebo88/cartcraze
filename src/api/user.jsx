@@ -87,6 +87,30 @@ export async function updateUser(email, username, currentPassword, newPassword, 
   }
 }
 
+export async function logoutUser(token) {
+  try {
+      const response = await fetch(`${API_URL}/logout`, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+          }
+      });
+
+      const data = await response.json();
+      console.log(data); // Log the response data
+      
+      // Check if the response is successful
+      if (response.ok) {
+          return 'Sign Out Successful!';
+      } else {
+          return 'Unable to Sign Out!';
+      }
+  } catch (error) {
+      console.error('Error logging out user:', error.message || 'Unknown error');
+  }
+}
+
 // Delete a user
 export async function deleteUser(userId){
   try {

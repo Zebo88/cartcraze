@@ -1,6 +1,6 @@
 import express from 'express';
 import { requireUser } from './util.js';
-import { createProduct, getProductById, getAllProducts, searchProducts, getProductCategories, getProductsByCategory, updateProduct, deleteProduct } from '../db/products.js';
+import { createProduct, getProductById, getAllProducts, getSortedProducts, searchProducts, getProductCategories, getProductsByCategory, updateProduct, deleteProduct } from '../db/products.js';
 
 const router = express.Router();
 
@@ -53,6 +53,21 @@ router.get('/:productId', async (req, res, next) => {
     res.json(product);
   } catch (error) {
     next(error);
+  }
+});
+
+// GET /api/products/sort/:direction/min/:minPrice/max/:maxPrice
+// Get products in a sorted order (direction ascending or descending) and a price range (min - max)
+router.get('/sort/:direction/min/:minPrice/max/:maxPrice', async (req, res) => {
+  try {
+    const { direction, minPrice, maxPrice } = req.params;
+    const products = await getSortedProducts(direction, minPrice, maxPrice);
+    // Send the products as a response
+    res.json(products);
+  } catch (error) {
+    // Handle errors
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 

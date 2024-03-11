@@ -28,6 +28,7 @@ export default function Checkout({ user, token, cart, setCart }){
   const [subtotalPrice, setSubtotalPrice] = useState(0);
   const [generalError, setGeneralError] = useState("");
   const [formErrors, setFormErrors] = useState({});
+  const [successMessage, setSuccessMessage] = useState(false);
   let formIsValid = false;
   const navigate = useNavigate();
 
@@ -180,35 +181,20 @@ export default function Checkout({ user, token, cart, setCart }){
       return;
     }
 
-//     // Retrieve existing order history from local storage
-// const existingOrderHistory = localStorage.getItem("order-history");
-// const previousOrders = existingOrderHistory ? JSON.parse(existingOrderHistory) : [];
-
-// // Get the current date and time
-// const currentDate = new Date();
-// const timestamp = currentDate.toLocaleString();
-
-// // Create a new order object with the cart items and the timestamp
-// const newOrder = {
-//   date: timestamp,
-//   items: cart
-// };
-
-// // Append the new order to the existing order history
-// const updatedOrderHistory = [...previousOrders, newOrder];
-
-// // Store the updated order history back into local storage
-// localStorage.setItem("order-history", JSON.stringify(updatedOrderHistory));
-
     // Clear the general error message if form is valid
     setGeneralError(""); 
     // Clear cart from localStorage
     if(formIsValid){
+      setSuccessMessage(true);
       localStorage.removeItem("cart");
       purchaseItems(user.user_id, token);
+
+      // After a delay, navigate to the homepage
+      setTimeout(() => {
+        navigate('/');
+      }, 3000); // Navigate after 3 seconds
     }
-    // Your checkout logic here
-    navigate('/');
+
   };
 
   return(
@@ -218,6 +204,11 @@ export default function Checkout({ user, token, cart, setCart }){
       <br />
       <Card style={{padding:"20px"}}>
       <Card.Title>{`Order Details (${subtotalQuantity} Items)`}</Card.Title>
+      {successMessage && 
+        <Alert variant="success">
+          Order Placed!
+        </Alert>
+      }
       <hr />
       <Row md={1} lg={1} xl={2}>
         <Col lg={6} xl={7}>

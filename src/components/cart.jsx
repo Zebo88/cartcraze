@@ -20,6 +20,7 @@ export default function Cart({ quantity, setQuantity, cart, setCart, cartArr, to
   const navigate = useNavigate();
   const [subtotalQuantity, setSubtotalQuantity] = useState(0);
   const [subtotalPrice, setSubtotalPrice] = useState(0);
+  const [message, setMessage] = useState("There are no items in your cart!");
 
   useEffect(() => {
     calculateSubtotal(cart);
@@ -138,7 +139,7 @@ export default function Cart({ quantity, setQuantity, cart, setCart, cartArr, to
     if(cart.products[0]){
       navigate('/checkout')
     }else{
-      return;
+      setMessage("You cannot proceed until you have added items to your cart!");
     }
   }
 
@@ -213,7 +214,7 @@ export default function Cart({ quantity, setQuantity, cart, setCart, cartArr, to
           ))
           :
           <Alert variant="warning">
-            There are no items in your cart!
+            {message}
           </Alert>
         }
           <Card.Title style={{fontSize:"12pt"}}>{`Subtotal (${subtotalQuantity} Items): $${subtotalPrice.toFixed(2)}`}</Card.Title>

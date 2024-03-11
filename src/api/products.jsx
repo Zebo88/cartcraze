@@ -72,6 +72,18 @@ export async function searchProducts(searchTerm){
   }
 }
 
+// Get all products of a specific sorting direction (ascending or descending) and a price range
+export async function sortProducts(direction, minPrice, maxPrice){
+  try {
+    const response = await fetch(`${API_URL}/sort/${direction}/min/${minPrice}/max/${maxPrice}`);
+    const result = await response.json();
+    
+    return result;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 // ADMINISTRATOR FUNCTIONS BELOW. If I have time, I will implement them.
 
 // Add a new product

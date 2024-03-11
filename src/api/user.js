@@ -91,7 +91,7 @@ router.get('/:userId', requireUser, async (req, res) => {
 });
 
 // POST /api/user/logout - Log out the user
-router.post('/logout', (req, res) => {
+router.post('/logout', requireUser, (req, res) => {
   try {
     // Check if the user is logged in
     if (!req.user) {

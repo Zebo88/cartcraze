@@ -147,7 +147,7 @@ export default function SingleProduct({ token, setToken, singleProduct, setSingl
       // Parse the cart array from JSON format to JavaScript array
       const cartArray = cartFromLocalStorage ? JSON.parse(cartFromLocalStorage) : [];
       
-      if(cartArray.products[0]){
+      if(cartArray && cartArray.products && cartArray.products.length > 0){
         // Check if the product already exists in the cart
         const existingProductIndex = cartArray.products.findIndex(item => item.product_id === singleProduct.product_id);
 

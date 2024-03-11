@@ -285,6 +285,18 @@ label {
   background-color: rgb(183, 183, 183);
 }
 
+.signout-link{
+  text-align: center;
+  font-size: 11pt;
+  color: #727272;
+  text-decoration: none;
+}
+
+.signout-link:hover{
+  color:#6401f9;
+  text-decoration: underline;
+}
+
 @media screen and (max-width:600px){
   .login-container {
     width: 300px;
@@ -321,6 +333,7 @@ label {
 
 .category-container{
   display: flex !important;
+  justify-content: space-between;
 }
 
 .category-pill{

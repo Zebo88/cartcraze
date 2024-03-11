@@ -47,6 +47,27 @@ async function getAllProducts() {
   }
 }
 
+async function getSortedProducts(ordering, minPrice, maxPrice) {
+  try {
+    // Ensure that the ordering parameter is either 'ASC' or 'DESC'
+    const direction = ordering.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
+
+    // Construct the SQL query string with the WHERE clause
+    const query = `
+      SELECT * FROM products
+      WHERE price BETWEEN $1 AND $2
+      ORDER BY price ${direction};
+    `;
+
+    // Execute the query with the provided parameters
+    const { rows } = await client.query(query, [minPrice, maxPrice]);
+
+    return rows; // Return all products from the database sorted by price within the specified range
+  } catch (error) {
+    throw error;
+  }
+}
+
 async function searchProducts(searchTerm) {
   try {
     const query = `
@@ -148,6 +169,7 @@ export {
   createProduct,
   getProductById,
   getAllProducts,
+  getSortedProducts,
   searchProducts,
   getProductCategories,
   getProductsByCategory,

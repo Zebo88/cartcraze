@@ -25,7 +25,7 @@ export default function Account({ token, setToken, user, setUser, orderHistory, 
 
         // Retrieve the user object from local storage
         const tokenFromLocalStorage = localStorage.getItem("token");
-        const tokenObject = userFromLocalStorage ? JSON.parse(tokenFromLocalStorage) : null;
+        const tokenObject = tokenFromLocalStorage ? JSON.parse(tokenFromLocalStorage) : null;
   
         // Set the user state
         setUser(userObject);

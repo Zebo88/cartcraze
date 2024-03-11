@@ -173,7 +173,7 @@ router.post('/:orderId/add', requireUser, async (req, res) => {
 // POST /api/orders/user/:userId/purchase - Create order using the items from the cart.
 router.post('/user/:userId/purchase', requireUser, async (req, res) => {
   try {
-    const userId = req.params.userId; // Corrected accessing userId from params
+    const userId = req.params.userId;
     // Get user's cart
     const cart = await getCartByUserId(userId);
     if (!cart) {
