@@ -209,7 +209,6 @@ function dismissAlert(){
                     <Form.Group className="mb-3" controlId="formBasicCheckbox" style={{margin:"15px 0"}}>
                       <Form.Check type="checkbox" label="Show Password" onClick={ handleToggle }/>
                     </Form.Group>
-                    <Button variant="info" style={{margin:"30px 0px"}} onClick={ handleUpdate }>Update</Button>
                   </Col>
                   <Col lg={6} md={12} style={{padding:"30px 30px"}}>
                     <Form.Label>House Number</Form.Label>
@@ -234,6 +233,9 @@ function dismissAlert(){
                     <Form.Control id='phone' type="text" placeholder={user.phone} value={ phone } 
                       onChange={ (e) => {setPhone(e.target.value)} }/>
                   </Col>
+                </Row>
+                <Row>
+                <Button variant="info" style={{margin:"30px 0px", width:"100px"}} onClick={ handleUpdate }>Update</Button>
                 </Row>
               </Form>
             </Card.Body>              
