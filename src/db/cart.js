@@ -57,25 +57,6 @@ async function getCartItemsByCartId(cartId) {
   }
 }
 
-// async function updateCart({ cartId, ...fields }) {
-//   try {
-//       const setFields = Object.keys(fields).map((key, index) => `"${key}"=$${index + 2}`).join(', ');
-//       const values = Object.values(fields);
-//       values.push(cartId);
-//       const { rows } = await client.query(`
-//           UPDATE carts
-//           SET ${setFields}
-//           WHERE cart_id = $1
-//           RETURNING *;
-//       `, values);
-//       return rows[0];
-//   } catch (error) {
-//       throw error;
-//   }
-// }
-// FUNCTION NOT NECESSARY: the only thing we are doing with the cart is creating one, getting one, and deleting one. 
-// KEEPING IN CASE I WANT IT LATER.
-
 async function deleteCart(cartId) {
   try {
       const { rows } = await client.query(`

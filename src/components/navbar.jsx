@@ -6,8 +6,6 @@ import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Button from 'react-bootstrap/Button';
 import CartCrazeLogo from '../images/CartLogo.jpeg'
-import cart from '../images/cart2.svg'
-import person from '../images/person.svg'
 import { Container } from "react-bootstrap";
 import Dropdown from 'react-bootstrap/Dropdown';
 import magnifyingGlass from "../images/magnifying-glass-solid.svg"

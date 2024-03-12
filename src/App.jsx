@@ -5,7 +5,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import NavigationBar from './components/navbar'
 import Home from './components/home';
 import Account from './components/account'
-import Products from './components/products';
 import Cart from './components/cart'
 import Login from './components/login'
 import Registration from './components/registration';
@@ -41,7 +40,6 @@ function App() {
     const history = localStorage.getItem('order-history');
     return history ? JSON.parse(history) : [];
   });
-  let cartArr = [];
 
   return (
     <>
@@ -60,22 +58,11 @@ function App() {
           <Route path='/' element={<Home
               products={products}
               setProducts={setProducts}
-              singleProduct={singleProduct}
-              setSingleProduct={setSingleProduct}
-              singleProductId={singleProductId}
               setSingleProductId={setSingleProductId}
-              recentlyViewed={recentlyViewed}
               setRecentlyViewed={setRecentlyViewed}
-              searchInput={searchInput}
-            />}
-          />
-          <Route path='/products' element={<Products
-              products={products}
-              setProducts={setProducts}
             />}
           />
           <Route path='/products/:id' element={<SingleProduct
-              token={token}
               setToken={setToken}
               singleProduct={singleProduct}
               setSingleProduct={setSingleProduct}
@@ -85,9 +72,7 @@ function App() {
               setQuantity={setQuantity}
               recentlyViewed={recentlyViewed}
               setRecentlyViewed={setRecentlyViewed}
-              cart={cart}
               setCart={setCart}
-              cartArr={cartArr}
               setUser={setUser}
             />}
           />
@@ -101,28 +86,19 @@ function App() {
             />}
           />
           <Route path='/login' element={<Login
-              token={token}
               setToken={setToken}
-              user={user}
               setUser={setUser}
             />}
           />
           <Route path='/registration' element={<Registration
-              token={token}
-              setToken={setToken}
-              user={user}
               setUser={setUser}
             />}
           />
           <Route path='/cart' element={<Cart
-              quantity={quantity}
-              setQuantity={setQuantity}
               cart={cart}
               setCart={setCart}
-              cartArr={cartArr}
               token={token}
               setToken={setToken}
-              user={user}
               setUser={setUser}
             />}
           />
@@ -134,9 +110,7 @@ function App() {
             />}
           />
           <Route path='/contact' element={<Contact/>}/>
-
         </Routes>
-      
       
       </div>
      <div className='footer-container'>

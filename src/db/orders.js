@@ -1,9 +1,12 @@
 import client from './client.js';
-import { getProductById } from './products.js'
 
 
 async function getCurrentDate() {
-  return new Date().toISOString().split('T')[0]; // Returns a date string in the format 'YYYY-MM-DD'
+  const currentDate = new Date();
+  const year = currentDate.getFullYear();
+  const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+  const day = String(currentDate.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 async function createOrder(userId) {
@@ -44,19 +47,6 @@ async function createOrderItem(orderItemData) {
     throw error;
   }
 }
-
-// async function getOrdersByUserId(userId) {
-//   try {
-//       const query = `
-//           SELECT * FROM orders
-//           WHERE user_id = $1;
-//       `;
-//       const { rows } = await client.query(query, [userId]);
-//       return rows;
-//   } catch (error) {
-//       throw new Error(`Error fetching orders for user ID ${userId}: ${error.message}`);
-//   }
-// }
 
 async function getOrdersByUserId(userId) {
   try {
@@ -113,37 +103,6 @@ async function getOrderItemsByOrderId(orderId) {
     throw new Error(`Error fetching order items for order ID ${orderId}: ${error.message}`);
   }
 }
-
-// async function getOrderHistoryWithItemsByUserId(userId) {
-//   try {
-//       const orders = await getOrdersByUserId(userId);
-//       const ordersWithItems = [];
-
-//       for (const order of orders) {
-//           const orderItems = await getOrderItemsByOrderId(order.order_id);
-//           const itemsWithProducts = [];
-
-//           for (const orderItem of orderItems) {
-//               const product = await getProductById(orderItem.product_id);
-//               const itemWithProduct = {
-//                   ...orderItem,
-//                   product: product
-//               };
-//               itemsWithProducts.push(itemWithProduct);
-//           }
-
-//           const orderWithItems = {
-//               ...order,
-//               items: itemsWithProducts
-//           };
-//           ordersWithItems.push(orderWithItems);
-//       }
-
-//       return ordersWithItems;
-//   } catch (error) {
-//       throw new Error(`Error fetching order history for user ID ${userId}: ${error.message}`);
-//   }
-// }  // FUNCTION NOT NEEDED, BUT KEEPING IN CASE I WANT IT FOR SOMETHING LATER.
 
 export {
   getCurrentDate,

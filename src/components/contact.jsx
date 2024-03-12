@@ -34,7 +34,7 @@ export default function Contact(){
         </Row>
         <Row>
         <Form.Group as={Col} controlId="formGridComments">
-            <Form.Label>Comments</Form.Label>
+            <Form.Label>Feedback</Form.Label>
             <Form.Control as="textarea" />
           </Form.Group>
         </Row>

@@ -25,17 +25,6 @@ export default function Filter({ setProducts }){
   setLowToHigh(false);
 }
 
-//   function getCorrectedPriceRange() {
-//     // If min price is greater than max price, set the min price to the max and visa versa
-//     console.log("Values before... Min: ", min, "Max: ", max);
-//     if (min > max) {
-//       const y = min;
-//       const x = max;
-//       setMax(y);
-//       setMin(x);
-//     }
-// }
-
 async function applyFilter() {
   try {
     // Determine the sort order based on checkbox states

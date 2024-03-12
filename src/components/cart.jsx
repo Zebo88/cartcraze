@@ -3,20 +3,13 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
-import CardGroup from 'react-bootstrap/CardGroup';
-import Form from 'react-bootstrap/Form';
 import Alert from 'react-bootstrap/Alert';
-import { Button, FormLabel } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 import { useNavigate, Link } from "react-router-dom";
 import { getAllCartsForUser, updateProductQuantityInCart, deleteSingleItemFromCart } from "../api/cart.jsx";
-// import { getSingleProduct } from "../api/products.jsx";
-// import Rating from "./rating";
-// import CartLogo from '../images/CartLogo.jpeg'
-// import { faHourglass1 } from "@fortawesome/free-solid-svg-icons";
-// import Footer from "./footer";
 
 
-export default function Cart({ quantity, setQuantity, cart, setCart, cartArr, token, setToken, user, setUser }){
+export default function Cart({ cart, setCart, token, setToken, setUser }){
   const navigate = useNavigate();
   const [subtotalQuantity, setSubtotalQuantity] = useState(0);
   const [subtotalPrice, setSubtotalPrice] = useState(0);
@@ -221,10 +214,6 @@ export default function Cart({ quantity, setQuantity, cart, setCart, cartArr, to
           <Card.Title style={{fontSize:"12pt"}}>{`Subtotal (${subtotalQuantity} Items): $${subtotalPrice.toFixed(2)}`}</Card.Title>
         </Card>
       </Container>
-
-      {/* <div className='footer-container-checkout'>
-        <Footer/>
-      </div>   */}
     </>  
   );
 }

@@ -3,12 +3,11 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Alert from 'react-bootstrap/Alert';
 import { login } from "../api/user.jsx";
-import Registration from "./registration";
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { logoutUser } from '../api/user.jsx'
 
-export default function Login({ token, setToken, setAccountData, user, setUser }){
+export default function Login({ setToken, setUser }){
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState(null);

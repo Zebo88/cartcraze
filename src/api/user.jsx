@@ -68,7 +68,7 @@ export async function updateUser(token, userId, userData) {
       },
       body: JSON.stringify(userData) // Send userData object as the body
     });
-    const result = await response.json();//error comes from here
+    const result = await response.json();
 
     return result;
   } catch (error) {
@@ -114,64 +114,3 @@ export async function deleteUser(userId){
   }
 } // I will implement this if I have time.
 
-// ADMINISTRATOR FUNCTIONS BELOW. I will implement them if I have time.
-
-// // Get all users
-// export async function getAllUsers(){
-//   try {
-//     const response = await fetch(API_URL);
-//     const result = await response.json();
-
-//     return result;
-//   } catch (error) {
-//     console.log(error);
-//   }
-// }
-
-// // Get single user
-// export async function getSingleUser(userId){
-//   try {
-//     const response = await fetch(`${API_URL}/${userId}`);
-//     const result = await response.json();
-
-//     return result;
-//   } catch (error) {
-//     console.log(error);
-//   }
-// }
-
-// // Get limited users
-// export async function getLimitedUsers(){
-//   try {
-//     const response = await fetch(`${API_URL}?limit=5`);
-//     const result = await response.json();
-
-//     return result;
-//   } catch (error) {
-//     console.log(error);
-//   }
-// }
-
-// // Get sorted ascending users (The default value is in ascending mode, you can use it with 'desc' or 'asc' as you want.)
-// export async function getSortedAscUsers(){
-//   try {
-//     const response = await fetch(`${API_URL}?sort=asc`);
-//     const result = await response.json();
-
-//     return result;
-//   } catch (error) {
-//     console.log(error);
-//   }
-// }
-
-// // Get sorted descending users
-// export async function getSortedDescUsers(){
-//   try {
-//     const response = await fetch(`${API_URL}?sort=desc`);
-//     const result = await response.json();
-
-//     return result;
-//   } catch (error) {
-//     console.log(error);
-//   }
-// }

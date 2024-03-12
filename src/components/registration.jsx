@@ -8,7 +8,7 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 
 
-export default function Registration({ setToken, user, setUser }){
+export default function Registration({ setUser }){
   const [message, setMessage] = useState(null);
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");

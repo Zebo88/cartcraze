@@ -11,7 +11,7 @@ import { getSingleProduct, getProductsOfCategory } from "../api/products.jsx";
 import { addProductToCart, getAllCartsForUser } from "../api/cart.jsx"
 
 
-export default function SingleProduct({ token, setToken, singleProduct, setSingleProduct, singleProductId, setSingleProductId, quantity, setQuantity, recentlyViewed, setRecentlyViewed, cart, setCart, cartArr, setUser }){
+export default function SingleProduct({ setToken, singleProduct, setSingleProduct, singleProductId, setSingleProductId, quantity, setQuantity, recentlyViewed, setRecentlyViewed, setCart, setUser }){
   const navigate = useNavigate();
   const [cat, setCat] = useState(null);
   const [similarItems, setSimilarItems] = useState(() => {

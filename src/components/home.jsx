@@ -2,20 +2,19 @@ import { React, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Rating from './rating';
 import Carousel from 'react-bootstrap/Carousel';
-import Button from 'react-bootstrap/Button';
 import CardGroup from 'react-bootstrap/CardGroup';
 import Card from 'react-bootstrap/Card';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
-import jewelryAd from '../images/jewelryAdNarrow.jpg'
-import hatAd from '../images/hatAdNarrow.jpg'
-import earbudsAd from '../images/earbudsAdNarrow.jpg'
+import jewelryAd from '../images/JewelryAd2.jpeg'
+import hatAd from '../images/HatAd2.jpeg'
+import earbudsAd from '../images/earbudsAd2.jpeg'
 import { getAllProducts, getProductsOfCategory } from "../api/products.jsx";
 import Category from "./category";
 import Filter from "./filter.jsx"
 import Alert from 'react-bootstrap/Alert';
 
-export default function Home({ products, setProducts, singleProduct, setSingleProduct, singleProductId, setSingleProductId, recentlyViewed, setRecentlyViewed, searchInput }){
+export default function Home({ products, setProducts, setSingleProductId, setRecentlyViewed }){
   const [category, setCategory] = useState("");
   const navigate = useNavigate();
 

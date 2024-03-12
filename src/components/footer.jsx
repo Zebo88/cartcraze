@@ -1,14 +1,9 @@
 import React from "react";
 import { useNavigate, Link } from "react-router-dom";
-import Button from 'react-bootstrap/Button';
 import CartCrazeLogo from '../images/CartCrazeLogo2.jpeg'
 
 export default function Footer(){
   const navigate = useNavigate();
-
-  function handleSubmit(){
-    navigate('/login');
-  }
 
   return(
     <div className="footer-items-container">

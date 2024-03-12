@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Nav from 'react-bootstrap/Nav';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -11,6 +10,7 @@ import Button from 'react-bootstrap/Button';
 import Alert from 'react-bootstrap/Alert';
 import { getOrdersByUserId } from "../api/orders.jsx";
 import { updateUser } from "../api/user.jsx"
+import { format } from 'date-fns';
 
 export default function Account({ token, setToken, user, setUser, orderHistory, setOrderHistory }){
   const [tab, setTab] = useState("Profile");
@@ -33,31 +33,33 @@ export default function Account({ token, setToken, user, setUser, orderHistory, 
   const [variant, setVariant] = useState("success");
   const [display, setDisplay] = useState("");
 
-  const navigate = useNavigate();
-
   useEffect(() => {
     async function getOrderHistoryAndUser() {
       try {
         // Retrieve the user object from local storage
         const userFromLocalStorage = localStorage.getItem("user");
         const userObject = userFromLocalStorage ? JSON.parse(userFromLocalStorage) : null;
-
+  
         // Retrieve the user object from local storage
         const tokenFromLocalStorage = localStorage.getItem("token");
         const tokenObject = tokenFromLocalStorage ? JSON.parse(tokenFromLocalStorage) : null;
   
         // Set the user state
         setUser(userObject);
-
+  
         //Set the token state
         setToken(tokenObject);
   
         // Fetch order history only if the user is available
         if (userObject && token) {
           const response = await getOrdersByUserId(userObject.user_id, token);
-          // const result = await response.json();
-          localStorage.setItem('order-history', JSON.stringify(response));
-          setOrderHistory(response);
+          // Format the date in each order object
+          const formattedOrders = response.map(order => ({
+            ...order,
+            order_date: format(new Date(order.order_date), 'yyyy-MM-dd'), // Format the date without the time portion
+          }));
+          localStorage.setItem('order-history', JSON.stringify(formattedOrders));
+          setOrderHistory(formattedOrders);
         }
       } catch (error) {
         console.error(error);
@@ -65,7 +67,7 @@ export default function Account({ token, setToken, user, setUser, orderHistory, 
     }
   
     getOrderHistoryAndUser();
-  }, []); 
+  }, []);
   
 
 function handleSelect(eventKey){

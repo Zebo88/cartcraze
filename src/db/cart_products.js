@@ -34,30 +34,6 @@ async function getCartProductsByCartId(cartId) {
   }
 }
 
-// Define the function to update a cart product
-// async function updateCartProduct({ id, ...fieldsToUpdate }) {
-//   try {
-//     const toUpdate = {};
-//     for (let column in fieldsToUpdate) {
-//       if (fieldsToUpdate[column] !== undefined) toUpdate[column] = fieldsToUpdate[column];
-//     }
-
-//     let cartProduct;
-//     if (Object.keys(toUpdate).length > 0) {
-//       const { rows } = await client.query(`
-//         UPDATE cart_products
-//         SET ${util.dbFields(toUpdate).insert}
-//         WHERE cart_product_id = ${id}
-//         RETURNING *;
-//       `, Object.values(toUpdate));
-//       cartProduct = rows[0];
-//     }
-//     return cartProduct;
-//   } catch (error) {
-//     throw error;
-//   }
-// } // DECIDED TO GO WITH A MORE SIMPLIFIED APPROACH TO UPDATING. KEEPING IN CASE I WANT IT LATER.
-
 async function updateCartProduct({ cartId, productId, quantity }) {
   try {
     // Check if productId and quantity are provided

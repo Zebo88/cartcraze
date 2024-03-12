@@ -72,9 +72,9 @@ async function searchProducts(searchTerm) {
   try {
     const query = `
       SELECT * FROM products
-      WHERE title LIKE '%' || $1 || '%'
-        OR category LIKE '%' || $1 || '%'
-        OR description LIKE '%' || $1 || '%';
+      WHERE LOWER(title) LIKE '%' || LOWER($1) || '%'
+        OR LOWER(category) LIKE '%' || LOWER($1) || '%'
+        OR LOWER(description) LIKE '%' || LOWER($1) || '%';
     `;
     const { rows } = await client.query(query, [searchTerm]);
 
