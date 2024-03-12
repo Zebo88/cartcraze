@@ -67,8 +67,10 @@ export default function Home({ products, setProducts, singleProduct, setSinglePr
       </Carousel>
 
       <div className="container category-container">
+        <div className="category-pill-container">
         <Category setCategory={setCategory}/>
         { category && <div className="category-pill">{capitalizeWords(category)}<h6 className="x" onClick={()=>{setCategory(""); setProducts([])}} >x</h6></div>}
+        </div>
         <Filter setProducts={setProducts}/>
       </div>
 

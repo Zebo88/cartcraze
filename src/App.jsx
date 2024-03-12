@@ -36,10 +36,6 @@ function App() {
     const storedRecentlyViewed = localStorage.getItem('recentlyViewed');
     return storedRecentlyViewed ? JSON.parse(storedRecentlyViewed) : [];
   });
-  // const [cart, setCart] = useState(() => {
-  //   const storedCart = localStorage.getItem('cart');
-  //   return storedCart ? JSON.parse(storedCart) : [];
-  // });
   const [cart, setCart] = useState([]);
   const [orderHistory, setOrderHistory] = useState(() => {
     const history = localStorage.getItem('order-history');

@@ -10,9 +10,28 @@ import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import Alert from 'react-bootstrap/Alert';
 import { getOrdersByUserId } from "../api/orders.jsx";
+import { updateUser } from "../api/user.jsx"
 
 export default function Account({ token, setToken, user, setUser, orderHistory, setOrderHistory }){
   const [tab, setTab] = useState("Profile");
+  const [update, setUpdate] = useState(false);
+  const [type, setType] = useState('password');
+  const [firstname, setFirstname] = useState('');
+  const [lastname, setLastname] = useState('');
+  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [housenum, setHouseNum] = useState('');
+  const [street, setStreet] = useState('');
+  const [city, setCity] = useState('');
+  const [state, setState] = useState('');
+  const [zipcode, setZipcode] = useState('');
+  const [country, setCountry] = useState('');
+  const [phone, setPhone] = useState('');
+  const [message, setMessage] = useState(false);
+  const [variant, setVariant] = useState("success");
+  const [display, setDisplay] = useState("");
 
   const navigate = useNavigate();
 
@@ -54,8 +73,59 @@ function handleSelect(eventKey){
 }
 
 function handleClick(){
+  setUpdate(true);
   return;
 }
+
+const handleToggle = () => {
+  if (type==='password'){
+     setType('text');
+  } else {
+     setType('password');
+  }
+}
+
+async function handleUpdate(e){
+  e.preventDefault();
+
+  const userData = {
+    email,
+    username,
+    currentPassword,
+    password: newPassword,
+    firstname,
+    lastname,
+    housenum,
+    street,
+    city,
+    state,
+    country,
+    zipcode,
+    phone
+  };
+  
+  const response = await updateUser(token, user.user_id, userData);
+  localStorage.setItem("user", JSON.stringify(response));
+  setUser(response);
+  
+  if(response.user_id){
+    setMessage(true);
+    setUpdate(false);
+    setVariant("success");
+    setDisplay("Your account has been updated!")
+  }else{
+    setMessage(true);
+    setUpdate(false);
+    setVariant("danger");
+    setDisplay("Couldn't update your account! Try again.")
+  }
+
+
+}
+
+function dismissAlert(){
+  setMessage(false);
+ }
 
   return(
     <Container style={{padding:"20px", backgroundColor:"#f7f7f7"}}>
@@ -74,9 +144,14 @@ function handleClick(){
        </Nav>
       </Container>
 
-      {tab === "Profile" &&
+      {tab === "Profile" && update === false &&
         <Container style={{marginTop:"0"}}>
           <Card style={{borderTop:"none",borderRadius:"0"}}>
+            { message && 
+              <Alert variant={variant} onClose={ dismissAlert } dismissible className="alert-container">
+                <p>{ display }</p>
+              </Alert>
+            }
               <Card.Body>
                 <Form style={{margin:"40px", marginLeft:"60px", width:"30rem"}} className="profile-form">
                   <Form.Label>First Name</Form.Label>
@@ -91,9 +166,69 @@ function handleClick(){
                   <Form.Control id='password' type="password" placeholder="**********" readOnly />
                   <Form.Label>Address</Form.Label>
                   <Form.Control id='address' as="textarea" placeholder={`${user.housenum} ${user.street}, ${user.city}, ${user.state}, ${user.zipcode}, ${user.country}`} readOnly />
-                  <Button variant="info" style={{margin:"30px 0px"}} onClick={ handleClick }>Update Info</Button>
+                  <Button variant="secondary" style={{margin:"30px 0px"}} onClick={ handleClick }>Update Info</Button>
                 </Form>
-              </Card.Body>
+              </Card.Body>              
+          </Card>
+        </Container>
+      }
+      {tab === "Profile" && update === true &&
+        <Container style={{marginTop:"0"}}>
+          <Card style={{borderTop:"none",borderRadius:"0"}}>
+            <Card.Body>
+              <Form style={{margin:"40px", marginLeft:"60px"}} className="profile-form">
+                <Row>
+                  <Col lg={6} md={12} style={{padding:"0px 30px"}}>
+                    <Card.Title>Enter the data you wish to update:</Card.Title>
+                    <Form.Label>First Name</Form.Label>
+                    <Form.Control id='firstname' type="text" placeholder={user.firstname} value={ firstname } 
+                      onChange={ (e) => {setFirstname(e.target.value)} }/>
+                    <Form.Label>Last Name</Form.Label>
+                    <Form.Control id='lastname' type="text" placeholder={user.lastname}  value={ lastname } 
+                      onChange={ (e) => {setLastname(e.target.value)} }/>
+                    <Form.Label>Email</Form.Label>
+                    <Form.Control id='email' type="email" placeholder={user.email}  value={ email } 
+                      onChange={ (e) => {setEmail(e.target.value)} }/>
+                    <Form.Label>Username</Form.Label>
+                    <Form.Control id='username' type="text" placeholder={user.username}  value={ username } 
+                      onChange={ (e) => {setUsername(e.target.value)} }/>
+                    <Form.Label>Current Password</Form.Label>
+                    <Form.Control id='currentPassword' type={type}  value={ currentPassword } 
+                      onChange={ (e) => {setCurrentPassword(e.target.value)} }/>
+                    <Form.Label>New Password</Form.Label>
+                    <Form.Control id='newPassword' type={type}  value={ newPassword } 
+                      onChange={ (e) => {setNewPassword(e.target.value)} }/>
+                    <Form.Group className="mb-3" controlId="formBasicCheckbox" style={{margin:"15px 0"}}>
+                      <Form.Check type="checkbox" label="Show Password" onClick={ handleToggle }/>
+                    </Form.Group>
+                    <Button variant="info" style={{margin:"30px 0px"}} onClick={ handleUpdate }>Update</Button>
+                  </Col>
+                  <Col lg={6} md={12} style={{padding:"30px 30px"}}>
+                    <Form.Label>House Number</Form.Label>
+                    <Form.Control id='housenum' type="text" placeholder={user.housenum} value={ housenum } 
+                      onChange={ (e) => {setHouseNum(e.target.value)} }/>
+                    <Form.Label>Street</Form.Label>
+                    <Form.Control id='street' type="text" placeholder={user.street} value={ street } 
+                      onChange={ (e) => {setStreet(e.target.value)} }/>
+                    <Form.Label>City</Form.Label>
+                    <Form.Control id='city' type="text" placeholder={user.city} value={ city } 
+                      onChange={ (e) => {setCity(e.target.value)} }/>
+                    <Form.Label>State</Form.Label>
+                    <Form.Control id='state' type="text" placeholder={user.state} value={ state } 
+                      onChange={ (e) => {setState(e.target.value)} }/>
+                    <Form.Label>Zipcode</Form.Label>
+                    <Form.Control id='zipcode' type="text" placeholder={user.zipcode} value={ zipcode } 
+                      onChange={ (e) => {setZipcode(e.target.value)} }/>
+                    <Form.Label>Country</Form.Label>
+                    <Form.Control id='country' type="text" placeholder={user.country} value={ country } 
+                      onChange={ (e) => {setCountry(e.target.value)} }/>
+                    <Form.Label>Phone Number</Form.Label>
+                    <Form.Control id='phone' type="text" placeholder={user.phone} value={ phone } 
+                      onChange={ (e) => {setPhone(e.target.value)} }/>
+                  </Col>
+                </Row>
+              </Form>
+            </Card.Body>              
           </Card>
         </Container>
       }

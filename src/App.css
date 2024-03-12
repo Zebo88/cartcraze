@@ -336,6 +336,11 @@ label {
   justify-content: space-between;
 }
 
+.category-pill-container{
+  display: flex;
+  flex-wrap: nowrap;
+}
+
 .category-pill{
   display: flex;
   margin: 2px 20px ;

@@ -17,7 +17,7 @@ export default function Checkout({ user, token, cart, setCart }){
   const [billState, setBillState] = useState("");
   const [billZipcode, setBillZipcode] = useState("");
   const [billCountry, setBillCountry] = useState("");
-  const [checked, setChecked] = useState(true);
+  const [checked, setChecked] = useState(false);
   const [shipName, setShipName] = useState("");
   const [shipAddress, setShipAddress] = useState(""); 
   const [shipCity, setShipCity] = useState("");
@@ -29,7 +29,7 @@ export default function Checkout({ user, token, cart, setCart }){
   const [generalError, setGeneralError] = useState("");
   const [formErrors, setFormErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState(false);
-  let formIsValid = false;
+  const [orderPlaced, setOrderPlaced] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -50,7 +50,7 @@ export default function Checkout({ user, token, cart, setCart }){
         calculateSubtotal(cart);
 
         // Once cart items are fetched, check if all the inputs are filled and navigate if valid
-        if (formIsValid) {
+        if (orderPlaced) {
           navigate('/');
         }
 
@@ -78,20 +78,16 @@ export default function Checkout({ user, token, cart, setCart }){
     setSubtotalPrice(totalPrice);
   }
 
-  function handleSubmit(e) {
-    e.preventDefault();
-    const errors = {};
-    formIsValid = true;
-
-    if(checked){
+  function handleCheckboxChange() {
+    if (!checked) {
       setShipName(name);
       setShipAddress(billAddress);
       setShipCity(billCity);
       setShipZipcode(billZipcode);
       setShipState(billState);
       setShipCountry(billCountry);
-    }
-    if(!checked){
+    } else {
+      // If the checkbox is unchecked, clear the shipping address fields
       setShipName('');
       setShipAddress('');
       setShipCity('');
@@ -99,6 +95,12 @@ export default function Checkout({ user, token, cart, setCart }){
       setShipState('');
       setShipCountry('');
     }
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    const errors = {};
+    let formIsValid = true;   
 
     if (!name) {
       errors.name = 'Name is required';
@@ -185,6 +187,7 @@ export default function Checkout({ user, token, cart, setCart }){
     setGeneralError(""); 
     // Clear cart from localStorage
     if(formIsValid){
+      setOrderPlaced(true);
       setSuccessMessage(true);
       localStorage.removeItem("cart");
       purchaseItems(user.user_id, token);
@@ -192,7 +195,7 @@ export default function Checkout({ user, token, cart, setCart }){
       // After a delay, navigate to the homepage
       setTimeout(() => {
         navigate('/');
-      }, 3000); // Navigate after 3 seconds
+      }, 2250); // Navigate after 2.25 seconds (random, but it just seemed right :P)
     }
 
   };
@@ -226,7 +229,7 @@ export default function Checkout({ user, token, cart, setCart }){
                     onChange={ (e) => {setName(e.target.value);} }
                     isInvalid={formErrors.name}
                   />
-                  <Form.Control.Feedback type="invalid">{formErrors.name}</Form.Control.Feedback>
+                  {/* <Form.Control.Feedback type="invalid">{formErrors.name}</Form.Control.Feedback> */}
                 </Form.Group>
                 <Form.Group>
                   <FormLabel>Card Number:</FormLabel>
@@ -237,7 +240,7 @@ export default function Checkout({ user, token, cart, setCart }){
                     onChange={ (e) => {setCardNum(e.target.value);} }
                     isInvalid={formErrors.cardNum}
                   />
-                  <Form.Control.Feedback type="invalid">{formErrors.cardNum}</Form.Control.Feedback>
+                  {/* <Form.Control.Feedback type="invalid">{formErrors.cardNum}</Form.Control.Feedback> */}
                 </Form.Group>
                 <Form.Group as={Col}>
                   <FormLabel>Expiration Date:</FormLabel>
@@ -248,7 +251,7 @@ export default function Checkout({ user, token, cart, setCart }){
                     onChange={ (e) => {setExpDate(e.target.value);} }
                     isInvalid={formErrors.expDate}
                   />
-                  <Form.Control.Feedback type="invalid">{formErrors.expDate}</Form.Control.Feedback>
+                  {/* <Form.Control.Feedback type="invalid">{formErrors.expDate}</Form.Control.Feedback> */}
                 </Form.Group>
                 <Form.Group as={Col}>
                   <FormLabel>CVC:</FormLabel>
@@ -259,7 +262,7 @@ export default function Checkout({ user, token, cart, setCart }){
                     onChange={ (e) => {setCvc(e.target.value);} }
                     isInvalid={formErrors.cvc}
                   />
-                  <Form.Control.Feedback type="invalid">{formErrors.cvc}</Form.Control.Feedback>
+                  {/* <Form.Control.Feedback type="invalid">{formErrors.cvc}</Form.Control.Feedback> */}
                 </Form.Group>
                 <Form.Group>
                 <FormLabel>Billing Address:</FormLabel>
@@ -270,7 +273,7 @@ export default function Checkout({ user, token, cart, setCart }){
                     onChange={ (e) => {setBillAddress(e.target.value);} }
                     isInvalid={formErrors.billAddress}
                   />
-                  <Form.Control.Feedback type="invalid">{formErrors.billAddress}</Form.Control.Feedback>
+                  {/* <Form.Control.Feedback type="invalid">{formErrors.billAddress}</Form.Control.Feedback> */}
                 </Form.Group>
                 <Form.Group as={Col}>
                   <Row style={{marginLeft:"0"}}>
@@ -282,7 +285,7 @@ export default function Checkout({ user, token, cart, setCart }){
                         onChange={ (e) => {setBillCity(e.target.value);} }
                         isInvalid={formErrors.billCity}
                       />
-                      <Form.Control.Feedback type="invalid">{formErrors.billCity}</Form.Control.Feedback>
+                      {/* <Form.Control.Feedback type="invalid">{formErrors.billCity}</Form.Control.Feedback> */}
                     <FormLabel>Zipcode:</FormLabel>
                     <Form.Control
                       type="text" 
@@ -291,7 +294,7 @@ export default function Checkout({ user, token, cart, setCart }){
                       onChange={ (e) => {setBillZipcode(e.target.value);} }
                       isInvalid={formErrors.billZipcode}
                       />
-                      <Form.Control.Feedback type="invalid">{formErrors.billZipcode}</Form.Control.Feedback>
+                      {/* <Form.Control.Feedback type="invalid">{formErrors.billZipcode}</Form.Control.Feedback> */}
                   </Row>
                 </Form.Group>
                 <Form.Group as={Col}>
@@ -313,7 +316,7 @@ export default function Checkout({ user, token, cart, setCart }){
                       <option>UT</option>
                       <option>WY</option>
                     </Form.Select>
-                    <Form.Control.Feedback type="invalid">{formErrors.billState}</Form.Control.Feedback>
+                    {/* <Form.Control.Feedback type="invalid">{formErrors.billState}</Form.Control.Feedback> */}
                     <FormLabel>Country:</FormLabel>
                     <Form.Control
                       type="text" 
@@ -322,7 +325,7 @@ export default function Checkout({ user, token, cart, setCart }){
                       onChange={ (e) => {setBillCountry(e.target.value);} }
                       isInvalid={formErrors.billCountry}
                     />
-                    <Form.Control.Feedback type="invalid">{formErrors.billCountry}</Form.Control.Feedback>
+                    {/* <Form.Control.Feedback type="invalid">{formErrors.billCountry}</Form.Control.Feedback> */}
                   </Row>
                 </Form.Group>
               </Row>
@@ -335,90 +338,93 @@ export default function Checkout({ user, token, cart, setCart }){
               type="checkbox"
               id={`default-checkbox`}
               label={`Same as billing address`}
-              defaultChecked={true}
-              onClick={()=>{ checked ? setChecked(false) : setChecked(true)}}
+              checked={checked}
+              // onClick={()=>{ checked ? setChecked(!checked) : setChecked(true)}}
+              onChange={() => {
+                setChecked(!checked); // Toggle the checked state
+                handleCheckboxChange(); // Update shipping details based on the checkbox state
+              }}
             />
-            { !checked &&
-              <Form style={{backgroundColor:"#e4e4e4"}}>
-                <Row style={{padding:"10px"}}>
-                  <Form.Group>
-                    <FormLabel>Name:</FormLabel>
-                    <Form.Control
-                      type="username" 
-                      placeholder="John Doe"
-                      value={ shipName } 
-                      onChange={ (e) => {setShipName(e.target.value);} }
-                      isInvalid={formErrors.shipName}
-                    />
-                    <Form.Control.Feedback type="invalid">{formErrors.shipName}</Form.Control.Feedback>
-                  </Form.Group>
-                  <Form.Group>
-                  <FormLabel>Address:</FormLabel>
-                    <Form.Control
-                      type="text" 
-                      placeholder="123 N 456 E"
-                      value={ shipAddress } 
-                      onChange={ (e) => {setShipAddress(e.target.value);} }
-                      isInvalid={formErrors.shipAddress}
-                    />
-                    <Form.Control.Feedback type="invalid">{formErrors.shipAddress}</Form.Control.Feedback>
-                  </Form.Group>
-                  <Form.Group as={Col}>
-                    <Row style={{margin:"0"}}>                      
-                        <FormLabel>City:</FormLabel>
-                        <Form.Control
-                          type="text" 
-                          placeholder="City"
-                          value={ shipCity } 
-                          onChange={ (e) => {setShipCity(e.target.value);} }
-                          isInvalid={formErrors.shipCity}
-                        />
-                        <Form.Control.Feedback type="invalid">{formErrors.shipCity}</Form.Control.Feedback>
-                      <FormLabel>Zipcode:</FormLabel>
+
+            <Form style={{backgroundColor:"#e4e4e4"}}>
+              <Row style={{padding:"10px"}}>
+                <Form.Group>
+                  <FormLabel>Name:</FormLabel>
+                  <Form.Control
+                    type="username" 
+                    placeholder="John Doe"
+                    value={ shipName } 
+                    onChange={ (e) => {setShipName(e.target.value);} }
+                    isInvalid={formErrors.shipName}
+                  />
+                  {/* <Form.Control.Feedback type="invalid">{formErrors.shipName}</Form.Control.Feedback> */}
+                </Form.Group>
+                <Form.Group>
+                <FormLabel>Address:</FormLabel>
+                  <Form.Control
+                    type="text" 
+                    placeholder="123 N 456 E"
+                    value={ shipAddress } 
+                    onChange={ (e) => {setShipAddress(e.target.value);} }
+                    isInvalid={formErrors.shipAddress}
+                  />
+                  {/* <Form.Control.Feedback type="invalid">{formErrors.shipAddress}</Form.Control.Feedback> */}
+                </Form.Group>
+                <Form.Group as={Col}>
+                  <Row style={{margin:"0"}}>                      
+                      <FormLabel>City:</FormLabel>
                       <Form.Control
                         type="text" 
-                        placeholder="#####"
-                        value={ shipZipcode } 
-                        onChange={ (e) => {setShipZipcode(e.target.value);} }
-                        isInvalid={formErrors.shipZipcode}
+                        placeholder="City"
+                        value={ shipCity } 
+                        onChange={ (e) => {setShipCity(e.target.value);} }
+                        isInvalid={formErrors.shipCity}
                       />
-                      <Form.Control.Feedback type="invalid">{formErrors.shipZipcode}</Form.Control.Feedback>
-                    </Row>
-                  </Form.Group>
-                  <Form.Group as={Col}>
-                    <Row style={{marginRight:"0", paddingRight:"0"}}>                    
-                      <FormLabel>State:</FormLabel>
-                        <Form.Select
-                          type="text" 
-                          placeholder="State"
-                          value={ shipState } 
-                          onChange={ (e) => {setShipState(e.target.value);} }
-                          isInvalid={formErrors.shipState}
-                          >                          
-                          <option>Select</option>
-                          <option>AZ</option>
-                          <option>CA</option>
-                          <option>CO</option>
-                          <option>ID</option>
-                          <option>NV</option>
-                          <option>UT</option>
-                          <option>WY</option>
-                        </Form.Select>
-                        <Form.Control.Feedback type="invalid">{formErrors.shipState}</Form.Control.Feedback>
-                        <FormLabel>Country:</FormLabel>
-                        <Form.Control
-                          type="text" 
-                          placeholder="USA"
-                          value={ shipCountry } 
-                          onChange={ (e) => {setShipCountry(e.target.value);} }
-                          isInvalid={formErrors.shipCountry}
-                        />
-                        <Form.Control.Feedback type="invalid">{formErrors.shipCountry}</Form.Control.Feedback>                    
-                    </Row>
-                  </Form.Group>
-                </Row>
-              </Form>
-            }
+                      {/* <Form.Control.Feedback type="invalid">{formErrors.shipCity}</Form.Control.Feedback> */}
+                    <FormLabel>Zipcode:</FormLabel>
+                    <Form.Control
+                      type="text" 
+                      placeholder="#####"
+                      value={ shipZipcode } 
+                      onChange={ (e) => {setShipZipcode(e.target.value);} }
+                      isInvalid={formErrors.shipZipcode}
+                    />
+                    {/* <Form.Control.Feedback type="invalid">{formErrors.shipZipcode}</Form.Control.Feedback> */}
+                  </Row>
+                </Form.Group>
+                <Form.Group as={Col}>
+                  <Row style={{marginRight:"0", paddingRight:"0"}}>                    
+                    <FormLabel>State:</FormLabel>
+                      <Form.Select
+                        type="text" 
+                        placeholder="State"
+                        value={ shipState } 
+                        onChange={ (e) => {setShipState(e.target.value);} }
+                        isInvalid={formErrors.shipState}
+                        >                          
+                        <option>Select</option>
+                        <option>AZ</option>
+                        <option>CA</option>
+                        <option>CO</option>
+                        <option>ID</option>
+                        <option>NV</option>
+                        <option>UT</option>
+                        <option>WY</option>
+                      </Form.Select>
+                      {/* <Form.Control.Feedback type="invalid">{formErrors.shipState}</Form.Control.Feedback> */}
+                      <FormLabel>Country:</FormLabel>
+                      <Form.Control
+                        type="text" 
+                        placeholder="USA"
+                        value={ shipCountry } 
+                        onChange={ (e) => {setShipCountry(e.target.value);} }
+                        isInvalid={formErrors.shipCountry}
+                      />
+                      {/* <Form.Control.Feedback type="invalid">{formErrors.shipCountry}</Form.Control.Feedback>                     */}
+                  </Row>
+                </Form.Group>
+              </Row>
+            </Form>
           </Container>
           
           </Col>

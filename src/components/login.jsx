@@ -76,6 +76,7 @@ export default function Login({ token, setToken, setAccountData, user, setUser }
       const response = await logoutUser(tokenObject);
       setVariant("success");
       setMessage(response);
+      setToken(null);
 
     }else{
       setVariant("danger");

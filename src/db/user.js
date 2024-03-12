@@ -110,42 +110,37 @@ async function getUserByUsername(userName) {
 
 async function updateUser(userId, userData) {
   try {
-    const isPWRequired = true; // creating this field for the getUserById() so that the user returned contains the password.
-    // Retrieve the user from the database to get the current password
+    const isPWRequired = true;
     const user = await getUserById(userId, isPWRequired);
 
-    // If the userData object contains a new password, update it
-    if (userData.password) {
-      // Compare the provided current password with the hashed password stored in the database
+    if (userData.currentPassword !== '' && userData.password !== '') {
       const isPasswordCorrect = await bcrypt.compare(userData.currentPassword, user.password);
-
+  
       if (!isPasswordCorrect) {
         throw new Error('Current password is incorrect');
       }
-
-      // Hash and salt the new password
+  
       const hashedPassword = await bcrypt.hash(userData.password, SALT_COUNT);
       userData.password = hashedPassword;
+    } else {
+      delete userData.password; // Remove password field from userData if it's blank
     }
 
-    // Construct the UPDATE query dynamically based on provided fields
     const updateFields = [];
     const values = [];
 
-    let placeholderIndex = 1; // Start index for placeholders
+    let placeholderIndex = 1;
 
     Object.keys(userData).forEach((key) => {
-      if (key !== 'currentPassword') {
+      if (key !== 'currentPassword' && userData[key] !== '') {
         updateFields.push(`${key} = $${placeholderIndex}`);
         values.push(userData[key]);
-        placeholderIndex++; // Increment the index for the next placeholder
+        placeholderIndex++;
       }
     });
 
-    // Add userId to the end of the values array
     values.push(userId);
 
-    // Construct the UPDATE query
     const query = `
       UPDATE users
       SET ${updateFields.join(', ')}
@@ -153,14 +148,17 @@ async function updateUser(userId, userData) {
       RETURNING *;
     `;
 
-    // Execute the UPDATE query
     const { rows } = await client.query(query, values);
+    
+    // Delete the password property from the rows object
+    delete rows[0].password;
 
-    return rows[0]; // Return the updated user
+    return rows[0];
   } catch (error) {
     throw new Error(`Error updating user: ${error.message}`);
   }
 }
+
 
 export {
   createUser,

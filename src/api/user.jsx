@@ -17,7 +17,6 @@ export async function login(username, password){
     });
 
     const result = await response.json();
-    console.log(result);
 
     return result;
   } catch (error) {
@@ -59,28 +58,18 @@ export async function addUser(email, username, password, firstname, lastname, ho
 }
 
 // Update a user with ID
-export async function updateUser(email, username, currentPassword, newPassword, firstname, lastname, housenum, street, city, state, country, zipcode, phone){
+export async function updateUser(token, userId, userData) {
   try {
-    const response = await fetch(`${API_URL}/update/${userId}`,{
+    const response = await fetch(`${API_URL}/update/${userId}`, {
       method: 'PATCH',
-      body: JSON.stringify({
-        email, 
-        username,
-        currentPassword,
-        newPassword, 
-        firstname, 
-        lastname, 
-        housenum, 
-        street, 
-        city, 
-        state, 
-        country, 
-        zipcode, 
-        phone
-      })
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(userData) // Send userData object as the body
     });
-    const result = await response.json();
-    
+    const result = await response.json();//error comes from here
+
     return result;
   } catch (error) {
     console.error(error);

@@ -8,76 +8,65 @@ export default function Filter({ setProducts }){
   const [min, setMin] = useState(0);
   const [max, setMax] = useState(2000);
   const [sortOrder, setSortOrder] = useState("ASC");
-  const [lowToHigh, setLowToHigh] = useState();
-  const [highToLow, setHighToLow] = useState();
+  const [lowToHigh, setLowToHigh] = useState(false);
+  const [highToLow, setHighToLow] = useState(false);
 
-  function handleCheckLowToHigh(){
-    setHighToLow(false); // Uncheck the other checkbox
-
+  function handleCheckLowToHigh() {
     // Toggle the lowToHigh state
     setLowToHigh(prevState => !prevState);
+    // Uncheck the highToLow checkbox
+    setHighToLow(false);
   }
 
-  function handleCheckHighToLow(){
-    setLowToHigh(false); // Uncheck the other checkbox
-
-    // Toggle the highToLow state
-    setHighToLow(prevState => !prevState);
-  }
-
-  function getCorrectedPriceRange() {
-    // If min price is greater than max price, set the min price to the max and visa versa
-    console.log("Values before... Min: ", min, "Max: ", max);
-    if (min > max) {
-      const y = min;
-      const x = max;
-      setMax(y);
-      setMin(x);
-    }
+  function handleCheckHighToLow() {
+  // Toggle the highToLow state
+  setHighToLow(prevState => !prevState);
+  // Uncheck the lowToHigh checkbox
+  setLowToHigh(false);
 }
 
-  async function applyFilter(){
-    try {
-      // Handle issues with inputs and correct them before sending the request
-      // getCorrectedPriceRange();
-      console.log("Min: ", min, "Max: ", max);
+//   function getCorrectedPriceRange() {
+//     // If min price is greater than max price, set the min price to the max and visa versa
+//     console.log("Values before... Min: ", min, "Max: ", max);
+//     if (min > max) {
+//       const y = min;
+//       const x = max;
+//       setMax(y);
+//       setMin(x);
+//     }
+// }
 
-      if(lowToHigh !== "checked" && highToLow !== "checked" && min === 0 && max === 2000){
-        // Send request to get all products in ASC order (default)
-        const allProducts = await getAllProducts();
-        // Store products in state for rerendering to homepage
-        setProducts(allProducts);
-      }else if(min > max){
-        // Send request to get filtered products
-        const filteredProducts = await sortProducts(sortOrder, max, min);
-        // Store products in state for rerendering to homepage
-        setProducts(filteredProducts);
-      }else if(!min && !max){
-        // Send request to get filtered products
-        const filteredProducts = await sortProducts(sortOrder, 0, 2000);
-        // Store products in state for rerendering to homepage
-        setProducts(filteredProducts);
-      }else if(!min){
-        // Send request to get filtered products
-        const filteredProducts = await sortProducts(sortOrder, 0, max);
-        // Store products in state for rerendering to homepage
-        setProducts(filteredProducts);
-      }else if(!max){
-        // Send request to get filtered products
-        const filteredProducts = await sortProducts(sortOrder, min, 2000);
-        // Store products in state for rerendering to homepage
-        setProducts(filteredProducts);
-      }else{
-        // Send request to get filtered products
-        const filteredProducts = await sortProducts(sortOrder, min, max);
-        // Store products in state for rerendering to homepage
-        setProducts(filteredProducts);
-      }
+async function applyFilter() {
+  try {
+    // Determine the sort order based on checkbox states
+    const sortOrder = lowToHigh ? "ASC" : highToLow ? "DESC" : "ASC";
 
-    } catch (error) {
-      console.error(error);
+    // Ensure the correct price range
+    let correctedMin = isNaN(min) ? 0 : min;
+    let correctedMax = isNaN(max) ? 2000 : max;
+
+    if (correctedMin > correctedMax) {
+      // Swap min and max values if min is greater than max
+      const temp = correctedMin;
+      correctedMin = correctedMax;
+      correctedMax = temp;
     }
+
+    if (!lowToHigh && !highToLow && correctedMin === 0 && correctedMax === 2000) {
+      // Send request to get all products in ASC order (default)
+      const allProducts = await getAllProducts();
+      // Store products in state for rerendering to homepage
+      setProducts(allProducts);
+    } else {
+      // Send request to get filtered products
+      const filteredProducts = await sortProducts(sortOrder, correctedMin, correctedMax);
+      // Store products in state for rerendering to homepage
+      setProducts(filteredProducts);
+    }
+  } catch (error) {
+    console.error(error);
   }
+}
 
   return(
     <Dropdown>
@@ -93,14 +82,14 @@ export default function Filter({ setProducts }){
           type="checkbox"
           id="low-high"
           label="Low to High"
-          onClick={ () => { handleCheckLowToHigh(); setSortOrder("ASC") } }
+          onChange={ () => { handleCheckLowToHigh(); setSortOrder("ASC") } }
         />
         <Form.Check
           checked={highToLow}
           type="checkbox"
           id="high-low"
           label="High to Low"
-          onClick={ () => { handleCheckHighToLow(); setSortOrder("DESC") } }
+          onChange={ () => { handleCheckHighToLow(); setSortOrder("DESC") } }
         />
         <br />
         <Form.Label>Price Range</Form.Label>

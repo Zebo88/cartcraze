@@ -148,6 +148,7 @@ export default function Cart({ quantity, setQuantity, cart, setCart, cartArr, to
       <Container>
         <Card style={{ padding: "20px" }}>
           <Card.Title style={{ fontSize: "18pt" }}>Shopping Cart</Card.Title>
+          <Link to={'/'} className="back-link">{`< Continue Shopping`}</Link>
           <hr style={{ border: "1px solid black" }} />
           <Row className="g-3">
             <Card.Title>{`Subtotal (${subtotalQuantity} Items): $${subtotalPrice.toFixed(2)}`}</Card.Title>
