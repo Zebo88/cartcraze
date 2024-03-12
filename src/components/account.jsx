@@ -53,13 +53,19 @@ export default function Account({ token, setToken, user, setUser, orderHistory, 
         // Fetch order history only if the user is available
         if (userObject && token) {
           const response = await getOrdersByUserId(userObject.user_id, token);
-          // Format the date in each order object
-          const formattedOrders = response.map(order => ({
-            ...order,
-            order_date: format(new Date(order.order_date), 'yyyy-MM-dd'), // Format the date without the time portion
-          }));
-          localStorage.setItem('order-history', JSON.stringify(formattedOrders));
-          setOrderHistory(formattedOrders);
+
+          if(response[0]){
+            // Format the date in each order object
+            const formattedOrders = response.map(order => ({
+              ...order,
+              order_date: format(new Date(order.order_date), 'yyyy-MM-dd'), // Format the date without the time portion
+            }));
+            localStorage.setItem('order-history', JSON.stringify(formattedOrders));
+            setOrderHistory(formattedOrders);
+          }else{
+            return;
+          }
+          
         }
       } catch (error) {
         console.error(error);

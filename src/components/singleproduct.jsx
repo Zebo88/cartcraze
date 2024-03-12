@@ -9,9 +9,10 @@ import { Container } from "react-bootstrap";
 import { Link, useNavigate } from 'react-router-dom';
 import { getSingleProduct, getProductsOfCategory } from "../api/products.jsx";
 import { addProductToCart, getAllCartsForUser } from "../api/cart.jsx"
+import Alert from 'react-bootstrap/Alert';
 
 
-export default function SingleProduct({ setToken, singleProduct, setSingleProduct, singleProductId, setSingleProductId, quantity, setQuantity, recentlyViewed, setRecentlyViewed, setCart, setUser }){
+export default function SingleProduct({ token, setToken, singleProduct, setSingleProduct, singleProductId, setSingleProductId, quantity, setQuantity, recentlyViewed, setRecentlyViewed, setCart, setUser }){
   const navigate = useNavigate();
   const [cat, setCat] = useState(null);
   const [similarItems, setSimilarItems] = useState(() => {
@@ -19,6 +20,7 @@ export default function SingleProduct({ setToken, singleProduct, setSingleProduc
     return storedSimilarItems ? JSON.parse(storedSimilarItems) : null;
   });
   const [cardsPerRow, setCardsPerRow] = useState(1);
+  const [message, setMessage] = useState(null);
 
   // useEffect to retrieve singleProductId from localStorage
   useEffect(() => {
@@ -119,59 +121,62 @@ export default function SingleProduct({ setToken, singleProduct, setSingleProduc
 
   async function addToCartHandler() {
     try {
-      // Retrieve the user object from local storage
-      const userFromLocalStorage = localStorage.getItem("user");
-      const userObject = userFromLocalStorage ? JSON.parse(userFromLocalStorage) : null;
+      if(token){
+        // Retrieve the user object from local storage
+        const userFromLocalStorage = localStorage.getItem("user");
+        const userObject = userFromLocalStorage ? JSON.parse(userFromLocalStorage) : null;
 
-      // Retrieve the user object from local storage
-      const tokenFromLocalStorage = localStorage.getItem("token");
-      const tokenObject = userFromLocalStorage ? JSON.parse(tokenFromLocalStorage) : null;
+        // Retrieve the user object from local storage
+        const tokenFromLocalStorage = localStorage.getItem("token");
+        const tokenObject = userFromLocalStorage ? JSON.parse(tokenFromLocalStorage) : null;
 
-      // Set the user state
-      setUser(userObject);
+        // Set the user state
+        setUser(userObject);
 
-      //Set the token state
-      setToken(tokenObject);
+        //Set the token state
+        setToken(tokenObject);
 
-      // Add the item to the cart
-      const response = await addProductToCart(userObject.user_id, singleProduct.product_id, quantity, tokenObject);
-      console.log(response);
+        // Add the item to the cart
+        const response = await addProductToCart(userObject.user_id, singleProduct.product_id, quantity, tokenObject);
+        console.log(response);
 
-      // Get the cart items
-      const resp = await getAllCartsForUser(userObject.user_id, tokenObject);
-      console.log(resp);
+        // Get the cart items
+        const resp = await getAllCartsForUser(userObject.user_id, tokenObject);
+        console.log(resp);
 
-      // Retrieve the current cart array from local storage
-      const cartFromLocalStorage = localStorage.getItem("cart");
-  
-      // Parse the cart array from JSON format to JavaScript array
-      const cartArray = cartFromLocalStorage ? JSON.parse(cartFromLocalStorage) : [];
-      
-      if(cartArray && cartArray.products && cartArray.products.length > 0){
-        // Check if the product already exists in the cart
-        const existingProductIndex = cartArray.products.findIndex(item => item.product_id === singleProduct.product_id);
+        // Retrieve the current cart array from local storage
+        const cartFromLocalStorage = localStorage.getItem("cart");
+    
+        // Parse the cart array from JSON format to JavaScript array
+        const cartArray = cartFromLocalStorage ? JSON.parse(cartFromLocalStorage) : [];
+        
+        if(cartArray && cartArray.products && cartArray.products.length > 0){
+          // Check if the product already exists in the cart
+          const existingProductIndex = cartArray.products.findIndex(item => item.product_id === singleProduct.product_id);
 
-        if (existingProductIndex !== -1) {
-          // If the product exists, update its quantity
-          cartArray.products[existingProductIndex].quantity += 1;
-        } else {
-          // If the product does not exist, add it to the cart with a quantity of 1
-          const productWithQuantity = { ...singleProduct, quantity };
-          cartArray.products.push(productWithQuantity);
+          if (existingProductIndex !== -1) {
+            // If the product exists, update its quantity
+            cartArray.products[existingProductIndex].quantity += 1;
+          } else {
+            // If the product does not exist, add it to the cart with a quantity of 1
+            const productWithQuantity = { ...singleProduct, quantity };
+            cartArray.products.push(productWithQuantity);
+          }
         }
+
+        // Store the updated cart array back to local storage
+        localStorage.setItem("cart", JSON.stringify(cartArray));
+
+    
+        // Set cart to the cartArray variable and navigate to the cart
+        setCart(cartArray);
+        navigate('/cart');
+
+        // Add the product to recently viewed items
+        addToRecentlyViewed(singleProduct);
+      }else{
+        setMessage(true);
       }
-
-      // Store the updated cart array back to local storage
-      localStorage.setItem("cart", JSON.stringify(cartArray));
-
-  
-      // Set cart to the cartArray variable and navigate to the cart
-      setCart(cartArray);
-      navigate('/cart');
-
-      // Add the product to recently viewed items
-      addToRecentlyViewed(singleProduct);
-
     } catch (error) {
       console.error("Error adding item to cart:", error);
     }
@@ -187,6 +192,10 @@ export default function SingleProduct({ setToken, singleProduct, setSingleProduc
     return chunkedArray;
   }
 
+  function dismissAlert(){
+    setMessage(false);
+   }
+
   return(
     <>
       <Container>
@@ -196,6 +205,11 @@ export default function SingleProduct({ setToken, singleProduct, setSingleProduc
                 <Col lg="8">
                 <Link to="/" className="back-link">{"< Back to Homepage"}</Link>
                 <br /><br />
+                {message &&
+                  <Alert variant="danger" onClose={ dismissAlert } dismissible className="alert-container">
+                    You must be logged in to add items to your cart!
+                  </Alert>
+                }
                   <Card.Img 
                     className="card-title" 
                     variant="top" 

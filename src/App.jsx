@@ -63,6 +63,7 @@ function App() {
             />}
           />
           <Route path='/products/:id' element={<SingleProduct
+              token={token}
               setToken={setToken}
               singleProduct={singleProduct}
               setSingleProduct={setSingleProduct}

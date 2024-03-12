@@ -17,60 +17,131 @@ export default function Registration({ setUser }){
   const [lastName, setLastName] = useState("");
   const [streetAddress, setStreetAddress] = useState("");
   const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [country, setCountry] = useState("");
   const [houseNum, setHouseNum] = useState("");
   const [zipcode, setZipcode] = useState("");
   const [phone, setPhone] = useState("");
   const [type, setType] = useState('password');
+  const [formErrors, setFormErrors] = useState({});
   const navigate = useNavigate();
-  let name = {
-    firstname:"",
-    lastname:""
-  };
-  let address = {
-    city:"",
-    street:"",
-    number:"",
-    zipcode:"",
-    geolocation:{
-      lat:'40.8296',
-      long:'73.9262'
-    }
-  }
+  let variant = "danger";
+  // let name = {
+  //   firstname:"",
+  //   lastname:""
+  // };
+  // let address = {
+  //   city:"",
+  //   street:"",
+  //   number:"",
+  //   zipcode:"",
+  //   geolocation:{
+  //     lat:'40.8296',
+  //     long:'73.9262'
+  //   }
+  // }
 
   async function handleSubmit(event){
     event.preventDefault();
+
+    const errors = {};
+    let formIsValid = true; 
   
     try {
-      if(firstName === '' || lastName === '' || username === '' || password === ''){
-        setMessage("Please fill out the entire form!");
+      // if(firstName === '' || lastName === '' || username === '' || password === ''){
+      //   setMessage("Please fill out the entire form!");
+      //   return;
+      // }
+
+      if (!firstName) {
+        errors.name = 'First name required';
+        formIsValid = false;
+      }
+  
+      if (!lastName) {
+        errors.cardNum = 'Last name required';
+        formIsValid = false;
+      }
+  
+      if (!email) {
+        errors.email = 'Email required';
+        formIsValid = false;
+      }
+  
+      if (!username) {
+        errors.username = 'Username required';
+        formIsValid = false;
+      }
+
+      if (!password) {
+        errors.password = 'Password required';
+        formIsValid = false;
+      }
+  
+      if (!streetAddress) {
+        errors.streetaddress = 'Street required';
+        formIsValid = false;
+      }
+  
+      if (!city) {
+        errors.city = 'City required';
+        formIsValid = false;
+      }
+  
+      if (!zipcode) {
+        errors.zipcode = 'Zipcode required';
+        formIsValid = false;
+      }
+  
+      if (!state) {
+        errors.state = 'State required';
+        formIsValid = false;
+      }
+  
+      if (!country) {
+        errors.country = 'Country required';
+        formIsValid = false;
+      }
+
+      if (!phone) {
+        errors.phone = 'Phone number required';
+        formIsValid = false;
+      }
+  
+      if (!formIsValid) {
+        variant = "danger";
+        setMessage("Please fill out all the inputs");
+        setFormErrors(errors);
         return;
       }
 
-      name.firstname=firstName;
-      name.lastname=lastName;
+      // Clear the general error message if form is valid
+      setMessage(""); 
 
-      address.city=city;
-      address.street=streetAddress;
-      address.number=houseNum;
-      address.zipcode=zipcode;
-
-      const response = await addUser(email, username, password, name, address, phone);    
-      console.log(response);
-      setUser({ email, username, password, name, address, phone });
-      
-      const user = { email, username, password, name, address, phone };
-      // Convert user object to string
-      const userString = JSON.stringify(user);
-      // Store user string in localStorage under the key 'user'
-      localStorage.setItem('user', userString);
-
-      if(response.id){
-        navigate('/login'); //No token is received, so I need to route the user to the login page so they can get a token.
-      }else{
-        throw new Error(response);
+      if(formIsValid){
+        const response = await addUser(email, username, password, firstName, lastName, houseNum, streetAddress, city, state, country, zipcode, phone);    
+        console.log(response);
+        setUser(response.user);
+        
+        // const user = { email, username, password, firstName, lastName, houseNum, streetAddress, city, state, country, zipcode, phone };
+        // Convert user object to string
+        const userString = JSON.stringify(response.user);
+        // Store user string in localStorage under the key 'user'
+        localStorage.setItem('user', userString);
+  
+        if(response.user){
+          variant = "success";
+          setMessage("Successfully registered! Please login to you new account!");
+          setTimeout(() => {
+            navigate('/login'); //No token is received, so I need to route the user to the login page so they can get a token.
+          }, 3000); // Navigate after 3 seconds 
+        }else{
+          throw new Error(response);
+        }
       }
   
     } catch (error) {
+      variant = "danger";
       setMessage(error.message);
       console.log(error);
     }
@@ -91,8 +162,13 @@ export default function Registration({ setUser }){
 
   return(
     <div className="main-container">
-      { message && 
+      { message && message !== "Successfully registered! Please login to you new account!" &&
           <Alert variant="danger" onClose={ dismissAlert } dismissible className="alert-container">
+            <p>{ message }</p>
+          </Alert>
+      }
+      { message && message === "Successfully registered! Please login to you new account!" &&
+          <Alert variant="success" onClose={ dismissAlert } dismissible className="alert-container">
             <p>{ message }</p>
           </Alert>
       }
@@ -109,6 +185,7 @@ export default function Registration({ setUser }){
                 placeholder='First Name'
                 value={ firstName } 
                 onChange={ (e) => {setFirstName(e.target.value); setMessage(null)} }
+                isInvalid={formErrors.firstName}
               />
             </Form.Group>
           </Col>
@@ -119,6 +196,7 @@ export default function Registration({ setUser }){
                 placeholder='Last Name'
                 value={ lastName } 
                 onChange={ (e) => {setLastName(e.target.value); setMessage(null)} }
+                isInvalid={formErrors.lastName}
               />
             </Form.Group>
           </Col>
@@ -130,6 +208,7 @@ export default function Registration({ setUser }){
               placeholder='Email'
               value={ email } 
               onChange={ (e) => {setEmail(e.target.value); setMessage(null)} }
+              isInvalid={formErrors.email}
             />
           </Form.Group>
 
@@ -141,6 +220,7 @@ export default function Registration({ setUser }){
                 placeholder='Username'
                 value={ username } 
                 onChange={ (e) => {setUsername(e.target.value); setMessage(null)} }
+                isInvalid={formErrors.username}
               />
             </Form.Group>
           </Col>
@@ -151,6 +231,7 @@ export default function Registration({ setUser }){
                 placeholder='Password'
                 value={ password } 
                 onChange={ (e) => {setPassword(e.target.value); setMessage(null)}}
+                isInvalid={formErrors.password}
               />
             </Form.Group>
           </Col>
@@ -168,6 +249,7 @@ export default function Registration({ setUser }){
                 placeholder='House or Apt #'
                 value={ houseNum } 
                 onChange={ (e) => {setHouseNum(e.target.value); setMessage(null)}}
+                isInvalid={formErrors.housenum}
               />
             </Form.Group>
           </Col>
@@ -178,6 +260,7 @@ export default function Registration({ setUser }){
                 placeholder='Street Address'
                 value={ streetAddress } 
                 onChange={ (e) => {setStreetAddress(e.target.value); setMessage(null)}}
+                isInvalid={formErrors.streetaddress}
               />
             </Form.Group>
           </Col>
@@ -191,6 +274,7 @@ export default function Registration({ setUser }){
                 placeholder='City'
                 value={ city } 
                 onChange={ (e) => {setCity(e.target.value); setMessage(null)}}
+                isInvalid={formErrors.city}
               />
             </Form.Group>
           </Col>
@@ -201,17 +285,43 @@ export default function Registration({ setUser }){
                 placeholder='Zipcode'
                 value={ zipcode } 
                 onChange={ (e) => {setZipcode(e.target.value); setMessage(null)}}
+                isInvalid={formErrors.zipcode}
               />
             </Form.Group>
           </Col>
         </Row>
 
+        <Row xs={1} md={2} className="mb-3 g-3">
+        <Col>
+            <Form.Group controlId="formBasicState">
+              <Form.Control
+                type="state"
+                placeholder='State'
+                value={ state } 
+                onChange={ (e) => {setState(e.target.value); setMessage(null)}}
+                isInvalid={formErrors.state}
+              />
+            </Form.Group>
+          </Col>
+          <Col>
+            <Form.Group controlId="formBasicCountry">
+              <Form.Control
+                type="country"
+                placeholder='Country'
+                value={ country } 
+                onChange={ (e) => {setCountry(e.target.value); setMessage(null)}}
+                isInvalid={formErrors.country}
+              />
+            </Form.Group>
+          </Col>
+        </Row>
           <Form.Group className="mb-3" controlId="formBasicPhone">
             <Form.Control
               type="phone"
               placeholder='Phone Number'
               value={ phone } 
               onChange={ (e) => {setPhone(e.target.value); setMessage(null)}}
+              isInvalid={formErrors.phone}
             />
           </Form.Group>
 
