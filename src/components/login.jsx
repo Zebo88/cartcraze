@@ -6,8 +6,9 @@ import { login } from "../api/user.jsx";
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { logoutUser } from '../api/user.jsx'
+import { addProductToCart } from '../api/cart.jsx'
 
-export default function Login({ setToken, setUser }){
+export default function Login({ setToken, setUser, preservedCart, setPreservedCart }){
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState(null);
@@ -34,7 +35,17 @@ export default function Login({ setToken, setUser }){
         localStorage.setItem("user", JSON.stringify(response.user));
         localStorage.setItem("token", JSON.stringify(response.token));
         setMessage("Sign In Successful!");
-        navigate('/');
+
+        // If the user added items to the cart before signed in, add those items to their cart in the database
+        if(preservedCart){
+          await addPreservedCartToDatabase(response.user.user_id, response.token, preservedCart);
+          // Navigate back to the cart so they can see their preserved cart items
+          navigate('/cart');
+        }else{
+          // Otherwise, navigate to the homepage after login
+          navigate('/');
+        }
+
       }else{
         throw new Error(response.message);
       }
@@ -58,6 +69,27 @@ export default function Login({ setToken, setUser }){
  function dismissAlert(){
   setMessage(null);
  }
+
+ async function addPreservedCartToDatabase(userId, tokenString, cart) {
+  try {
+    // Create an array to store promises returned by addProductToCart
+    const promises = cart.products.map((product) => {
+      // Call addProductToCart for each product and store the promise
+      return addProductToCart(userId, product.product_id, product.quantity, tokenString);
+    });
+
+    // Wait for all promises to resolve
+    await Promise.all(promises);
+
+    if(promises){
+      return promises;
+    }
+    
+  } catch (error) {
+    console.error(error);
+    return error;
+  }
+}
 
  async function signout(){
   try {

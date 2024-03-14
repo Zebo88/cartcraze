@@ -26,20 +26,7 @@ export default function Registration({ setUser }){
   const [formErrors, setFormErrors] = useState({});
   const navigate = useNavigate();
   let variant = "danger";
-  // let name = {
-  //   firstname:"",
-  //   lastname:""
-  // };
-  // let address = {
-  //   city:"",
-  //   street:"",
-  //   number:"",
-  //   zipcode:"",
-  //   geolocation:{
-  //     lat:'40.8296',
-  //     long:'73.9262'
-  //   }
-  // }
+
 
   async function handleSubmit(event){
     event.preventDefault();
@@ -48,10 +35,6 @@ export default function Registration({ setUser }){
     let formIsValid = true; 
   
     try {
-      // if(firstName === '' || lastName === '' || username === '' || password === ''){
-      //   setMessage("Please fill out the entire form!");
-      //   return;
-      // }
 
       if (!firstName) {
         errors.name = 'First name required';
@@ -120,10 +103,8 @@ export default function Registration({ setUser }){
 
       if(formIsValid){
         const response = await addUser(email, username, password, firstName, lastName, houseNum, streetAddress, city, state, country, zipcode, phone);    
-        console.log(response);
         setUser(response.user);
         
-        // const user = { email, username, password, firstName, lastName, houseNum, streetAddress, city, state, country, zipcode, phone };
         // Convert user object to string
         const userString = JSON.stringify(response.user);
         // Store user string in localStorage under the key 'user'

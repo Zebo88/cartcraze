@@ -40,6 +40,7 @@ function App() {
     const history = localStorage.getItem('order-history');
     return history ? JSON.parse(history) : [];
   });
+const [preservedCart, setPreservedCart] = useState();
 
   return (
     <>
@@ -89,6 +90,8 @@ function App() {
           <Route path='/login' element={<Login
               setToken={setToken}
               setUser={setUser}
+              preservedCart={preservedCart}
+              setPreservedCart={setPreservedCart}
             />}
           />
           <Route path='/registration' element={<Registration
@@ -101,6 +104,8 @@ function App() {
               token={token}
               setToken={setToken}
               setUser={setUser}
+              preservedCart={preservedCart}
+              setPreservedCart={setPreservedCart}
             />}
           />
           <Route path='/checkout' element={<Checkout

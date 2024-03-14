@@ -9,11 +9,12 @@ import { useNavigate, Link } from "react-router-dom";
 import { getAllCartsForUser, updateProductQuantityInCart, deleteSingleItemFromCart } from "../api/cart.jsx";
 
 
-export default function Cart({ cart, setCart, token, setToken, setUser }){
+export default function Cart({ cart, setCart, token, setToken, setUser, preservedCart, setPreservedCart }){
   const navigate = useNavigate();
   const [subtotalQuantity, setSubtotalQuantity] = useState(0);
   const [subtotalPrice, setSubtotalPrice] = useState(0);
   const [message, setMessage] = useState("There are no items in your cart!");
+  const [notRegistered, setNotRegistered] = useState(false);
 
   useEffect(() => {
     // Calculate subtotal when cart data changes
@@ -174,10 +175,24 @@ export default function Cart({ cart, setCart, token, setToken, setUser }){
 
   function handleSubmit(){
     if(cart.products[0]){
-      navigate('/checkout')
+      if(token){
+        navigate('/checkout')
+      }else{
+        setNotRegistered(true);
+      }
+      
     }else{
       setMessage("You cannot proceed until you have added items to your cart!");
     }
+  }
+
+  function handlePreservationOfCart(){
+    // Retrieve the cart from local storage
+    const cartFromLocalStorage = JSON.parse(localStorage.getItem("cart")); 
+    // Set the preserved cart state
+    setPreservedCart(cartFromLocalStorage);
+    // Navigate to login so the user can create an account or login
+    navigate('/login');
   }
 
   return (
@@ -189,10 +204,26 @@ export default function Cart({ cart, setCart, token, setToken, setUser }){
           <hr style={{ border: "1px solid black" }} />
           <Row className="g-3">
             <Card.Title>{`Subtotal (${subtotalQuantity} Items): $${subtotalPrice.toFixed(2)}`}</Card.Title>
-            <Button className="proceed-btn" variant="info" onClick={handleSubmit}>Proceed to Checkout</Button>
+            <Button className="proceed-btn" variant="info" onClick={ handleSubmit }>Proceed to Checkout</Button>
           </Row>
 
           <hr />
+
+          {notRegistered && 
+            <Alert variant="warning">
+              <Alert.Heading>You are not logged in!</Alert.Heading>
+              <p>Do you wish to login, or continue as guest?</p>
+              <hr />
+              <div className="d-flex justify-content-center">
+                <Button onClick={() => navigate('/checkout')} variant="warning" style={{marginRight:"25px"}}>
+                  Continue as Guest
+                </Button>
+                <Button onClick={ handlePreservationOfCart } variant="warning">
+                  Login
+                </Button>
+              </div>
+            </Alert>
+          }
           
           {cart.products?.length > 0 ? cart.products.map((item, idx) => (
             <Row key={idx} className="g-4">
