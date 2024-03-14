@@ -16,64 +16,107 @@ export default function Cart({ cart, setCart, token, setToken, setUser }){
   const [message, setMessage] = useState("There are no items in your cart!");
 
   useEffect(() => {
+    // Calculate subtotal when cart data changes
     calculateSubtotal(cart);
   }, [cart]);
 
   useEffect(() => {
-    async function getCartItems() {
-      try {
-        // Retrieve the user object from local storage
-        const userFromLocalStorage = localStorage.getItem("user");
-        const userObject = userFromLocalStorage ? JSON.parse(userFromLocalStorage) : null;
-
-        // Retrieve the user object from local storage
-        const tokenFromLocalStorage = localStorage.getItem("token");
-        const tokenObject = userFromLocalStorage ? JSON.parse(tokenFromLocalStorage) : null;
+    // UseEffect for a guest user
+    if (!token) {
+      // Retrieve the cart from local storage
+      const cartFromLocalStorage = localStorage.getItem('cart');
   
-        // Set the user state
-        setUser(userObject);
-
-        //Set the token state
-        setToken(tokenObject);
+      if (cartFromLocalStorage) {
+        // If the cart exists in local storage, set it to the state
+        setCart(JSON.parse(cartFromLocalStorage));
+      } else {
+        // If the cart doesn't exist in local storage, create an initial empty cart structure
+        const initialCart = { products: [] };
   
-        // Fetch order history only if the user is available
-        if (userObject && token) {
-          const response = await getAllCartsForUser(userObject.user_id, token);
-          localStorage.setItem('cart', JSON.stringify(response));
-          setCart(response);
-        }
-      } catch (error) {
-        console.error(error);
+        // Store the initial cart in local storage
+        localStorage.setItem('cart', JSON.stringify(initialCart));
+  
+        // Set the initial cart to the state
+        setCart(initialCart);
       }
     }
+  }, []);
 
-    getCartItems();   
+  useEffect(() => {
+    async function getCartItems() {
+      if(token){
+        try {
+
+          // Retrieve the user object from local storage
+          const userFromLocalStorage = localStorage.getItem("user");
+          const userObject = userFromLocalStorage ? JSON.parse(userFromLocalStorage) : null;
+  
+          // Retrieve the user object from local storage
+          const tokenFromLocalStorage = localStorage.getItem("token");
+          const tokenObject = userFromLocalStorage ? JSON.parse(tokenFromLocalStorage) : null;
+    
+          // Set the user state
+          setUser(userObject);
+  
+          //Set the token state
+          setToken(tokenObject);
+    
+          // Fetch order history only if the user is available
+          if (userObject && token) {
+            const response = await getAllCartsForUser(userObject.user_id, token);
+            localStorage.setItem('cart', JSON.stringify(response));
+            setCart(response);
+          }
+          
+        } catch (error) {
+          console.error(error);
+        }
+      }
+  
+    }
+    
+    getCartItems(); 
 
   },[cart]);
 
   async function handleDelete(itemId){
 
     try {
-      const productId = itemId;
-      // Retrieve the current cart array from localStorage
-      const cartFromLocalStorage = localStorage.getItem("cart");
-      // Parse the cart array from JSON format to JavaScript array
-      const cartArray = cartFromLocalStorage ? JSON.parse(cartFromLocalStorage) : [];
-  
-      // Filter out the item with the specified ID
-      const updatedCart = cartArray.products.filter(item => item.product_id !== itemId);
-      
-      // Update localStorage with the new cart array
-      localStorage.setItem("cart", JSON.stringify(updatedCart));
+      let updatedCart = [];
 
-      const response = await deleteSingleItemFromCart(updatedCart.cart_id, productId, token)
-      console.log(response);
+      if(token){
+        const productId = itemId;
+        // Retrieve the current cart array from localStorage
+        const cartFromLocalStorage = localStorage.getItem("cart");
+        // Parse the cart array from JSON format to JavaScript array
+        const cartArray = cartFromLocalStorage ? JSON.parse(cartFromLocalStorage) : {};
+    
+        // Filter out the item with the specified ID
+         updatedCart = cartArray.products.filter(item => item.product_id !== itemId);
+        
+        // Update localStorage with the new cart array
+        localStorage.setItem("cart", JSON.stringify({ products: updatedCart }));
+  
+        const response = await deleteSingleItemFromCart(updatedCart.cart_id, productId, token)
+  
+      }else{
+        // Retrieve the current cart array from local storage
+        const cartFromLocalStorage = localStorage.getItem("cart");
+  
+        // Parse the cart array from JSON format to JavaScript array
+        const cartArray = cartFromLocalStorage ? JSON.parse(cartFromLocalStorage) : { products: [] }; 
+
+        // Filter out the item with the specified ID
+        updatedCart = cartArray.products.filter(item => item.product_id !== itemId);
+
+        // Update localStorage with the new cart array
+        localStorage.setItem("cart", JSON.stringify({ products: updatedCart }));
+
+      }
 
       // Update state
-      setCart(updatedCart);
-
-      // Recalculate subtotal and item quantities
-      calculateSubtotal(updatedCart); 
+      setCart({ products: updatedCart });
+      
   
       console.log("Item deleted successfully!");
     } catch (error) {
@@ -90,10 +133,12 @@ export default function Cart({ cart, setCart, token, setToken, setUser }){
           // Ensure that the new quantity is at least 1
           newQuantity = Math.max(newQuantity, 1);
           
-          // Update the quantity in the database
-          updateProductQuantityInCart(cart.cart_id, itemId, newQuantity, token)
+          if(token){
+            // Update the quantity in the database
+            updateProductQuantityInCart(cart.cart_id, itemId, newQuantity, token)
             .then(() => console.log('Quantity updated successfully'))
             .catch(error => console.error('Error updating quantity:', error));
+          }
   
           return { ...item, quantity: newQuantity };
         }
@@ -101,29 +146,28 @@ export default function Cart({ cart, setCart, token, setToken, setUser }){
       });
   
       // Update localStorage with the updated cart
-      localStorage.setItem("cart", JSON.stringify(updatedCart));
+      localStorage.setItem("cart", JSON.stringify({ products: updatedCart }));
   
       // Update state with the updated cart
-      setCart(updatedCart);
+      setCart({ products: updatedCart });
   
-      // Recalculate subtotal and item quantities
-      calculateSubtotal(updatedCart);
     } catch (error) {
       console.error("Error updating quantity:", error);
     }
   }
 
-  function calculateSubtotal(cartArray) {
+  function calculateSubtotal(cartObject) {
     let totalQuantity = 0;
     let totalPrice = 0;
-
-    if(cartArray.products)(
-      cartArray.products.forEach(item => {
+  
+    if (cartObject.products && Array.isArray(cartObject.products)) {
+      // If cartObject has a products array
+      cartObject.products.forEach(item => {
         totalQuantity += item.quantity;
         totalPrice += item.price * item.quantity;
-      })
-    )
-
+      });
+    }
+  
     setSubtotalQuantity(totalQuantity);
     setSubtotalPrice(totalPrice);
   }

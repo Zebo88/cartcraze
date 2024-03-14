@@ -9,7 +9,6 @@ import { Container } from "react-bootstrap";
 import { Link, useNavigate } from 'react-router-dom';
 import { getSingleProduct, getProductsOfCategory } from "../api/products.jsx";
 import { addProductToCart, getAllCartsForUser } from "../api/cart.jsx"
-import Alert from 'react-bootstrap/Alert';
 
 
 export default function SingleProduct({ token, setToken, singleProduct, setSingleProduct, singleProductId, setSingleProductId, quantity, setQuantity, recentlyViewed, setRecentlyViewed, setCart, setUser }){
@@ -20,7 +19,6 @@ export default function SingleProduct({ token, setToken, singleProduct, setSingl
     return storedSimilarItems ? JSON.parse(storedSimilarItems) : null;
   });
   const [cardsPerRow, setCardsPerRow] = useState(1);
-  const [message, setMessage] = useState(null);
 
   // useEffect to retrieve singleProductId from localStorage
   useEffect(() => {
@@ -121,6 +119,7 @@ export default function SingleProduct({ token, setToken, singleProduct, setSingl
 
   async function addToCartHandler() {
     try {
+      // If the user is logged in, add the cart data to the database
       if(token){
         // Retrieve the user object from local storage
         const userFromLocalStorage = localStorage.getItem("user");
@@ -128,7 +127,7 @@ export default function SingleProduct({ token, setToken, singleProduct, setSingl
 
         // Retrieve the user object from local storage
         const tokenFromLocalStorage = localStorage.getItem("token");
-        const tokenObject = userFromLocalStorage ? JSON.parse(tokenFromLocalStorage) : null;
+        const tokenObject = tokenFromLocalStorage ? JSON.parse(tokenFromLocalStorage) : null;
 
         // Set the user state
         setUser(userObject);
@@ -137,46 +136,58 @@ export default function SingleProduct({ token, setToken, singleProduct, setSingl
         setToken(tokenObject);
 
         // Add the item to the cart
-        const response = await addProductToCart(userObject.user_id, singleProduct.product_id, quantity, tokenObject);
-        console.log(response);
+        await addProductToCart(userObject.user_id, singleProduct.product_id, quantity, tokenObject);
 
         // Get the cart items
-        const resp = await getAllCartsForUser(userObject.user_id, tokenObject);
-        console.log(resp);
+        await getAllCartsForUser(userObject.user_id, tokenObject);
 
-        // Retrieve the current cart array from local storage
-        const cartFromLocalStorage = localStorage.getItem("cart");
-    
-        // Parse the cart array from JSON format to JavaScript array
-        const cartArray = cartFromLocalStorage ? JSON.parse(cartFromLocalStorage) : [];
-        
-        if(cartArray && cartArray.products && cartArray.products.length > 0){
-          // Check if the product already exists in the cart
-          const existingProductIndex = cartArray.products.findIndex(item => item.product_id === singleProduct.product_id);
+      }
 
-          if (existingProductIndex !== -1) {
-            // If the product exists, update its quantity
-            cartArray.products[existingProductIndex].quantity += 1;
-          } else {
-            // If the product does not exist, add it to the cart with a quantity of 1
-            const productWithQuantity = { ...singleProduct, quantity };
-            cartArray.products.push(productWithQuantity);
-          }
+      // Retrieve the current cart array from local storage
+      const cartFromLocalStorage = localStorage.getItem("cart");
+  
+      // Parse the cart array from JSON format to JavaScript array
+      const cartArray = cartFromLocalStorage ? JSON.parse(cartFromLocalStorage) : { products: [] }; 
+
+    //   // Ensure cartArray.products is initialized as an empty array if it's undefined
+    //   if (!cartArray.products) {
+    //     cartArray.products = [];
+    // }
+      
+      if(cartArray && cartArray.products && cartArray.products.length > 0){
+        // Check if the product already exists in the cart
+        const existingProductIndex = cartArray.products.findIndex(item => item.product_id === singleProduct.product_id);
+
+        if (existingProductIndex !== -1) {
+          // If the product exists, update its quantity
+          cartArray.products[existingProductIndex].quantity += 1;
+        } else {
+          // If the product does not exist, add it to the cart with a quantity of 1
+          const productWithQuantity = { ...singleProduct, quantity };
+          cartArray.products.push(productWithQuantity);
         }
 
         // Store the updated cart array back to local storage
         localStorage.setItem("cart", JSON.stringify(cartArray));
 
-    
-        // Set cart to the cartArray variable and navigate to the cart
-        setCart(cartArray);
-        navigate('/cart');
+      }else {
+        // If the cart is empty, simply add the new product to it
+        const productWithQuantity = { ...singleProduct, quantity };
+        cartArray.products.push(productWithQuantity);
 
-        // Add the product to recently viewed items
-        addToRecentlyViewed(singleProduct);
-      }else{
-        setMessage(true);
+        // Store the updated cart array back to local storage
+        localStorage.setItem("cart", JSON.stringify(cartArray));
       }
+
+      
+
+      // Set cart to the cartArray variable and navigate to the cart
+      setCart(cartArray);
+      navigate('/cart');
+
+      // Add the product to recently viewed items
+      addToRecentlyViewed(singleProduct);
+      // setMessage(true);
     } catch (error) {
       console.error("Error adding item to cart:", error);
     }
@@ -192,10 +203,6 @@ export default function SingleProduct({ token, setToken, singleProduct, setSingl
     return chunkedArray;
   }
 
-  function dismissAlert(){
-    setMessage(false);
-   }
-
   return(
     <>
       <Container>
@@ -205,11 +212,6 @@ export default function SingleProduct({ token, setToken, singleProduct, setSingl
                 <Col lg="8">
                 <Link to="/" className="back-link">{"< Back to Homepage"}</Link>
                 <br /><br />
-                {message &&
-                  <Alert variant="danger" onClose={ dismissAlert } dismissible className="alert-container">
-                    You must be logged in to add items to your cart!
-                  </Alert>
-                }
                   <Card.Img 
                     className="card-title" 
                     variant="top" 

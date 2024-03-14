@@ -190,12 +190,18 @@ export default function Checkout({ user, token, cart, setCart }){
       setOrderPlaced(true);
       setSuccessMessage(true);
       localStorage.removeItem("cart");
-      purchaseItems(user.user_id, token);
+
+      if(token){
+        // Create order for user in database (registered user feature only)
+        purchaseItems(user.user_id, token);
+      }      
+      
+      alert("Order placed!");
 
       // After a delay, navigate to the homepage
       setTimeout(() => {
         navigate('/');
-      }, 2250); // Navigate after 2.25 seconds (random, but it just seemed right :P)
+      }, 1000); // Navigate after 2.25 seconds (random, but it just seemed right :P)
     }
 
   };
