@@ -20,6 +20,11 @@ export default function SingleProduct({ token, setToken, singleProduct, setSingl
   });
   const [cardsPerRow, setCardsPerRow] = useState(1);
 
+  useEffect(() => {
+    // Scroll to the top of the page
+    window.scrollTo(0, 0);
+  }, [singleProductId]);
+
   // useEffect to retrieve singleProductId from localStorage
   useEffect(() => {
     const storedProductId = localStorage.getItem('singleProductId');

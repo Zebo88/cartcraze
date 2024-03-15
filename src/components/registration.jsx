@@ -164,6 +164,7 @@ export default function Registration({ setUser }){
           <Col>
             <Form.Group controlId="formBasicFirstName">
               <Form.Control 
+                name='firstname'
                 type="firstName" 
                 placeholder='First Name'
                 value={ firstName } 
@@ -175,6 +176,7 @@ export default function Registration({ setUser }){
           <Col>
             <Form.Group  controlId="formBasicLastName">
               <Form.Control 
+                name='lastname'
                 type="lastName" 
                 placeholder='Last Name'
                 value={ lastName } 
@@ -187,6 +189,7 @@ export default function Registration({ setUser }){
 
         <Form.Group className="mb-3" controlId="formBasicEmail">
             <Form.Control 
+              name='email'
               type="email" 
               placeholder='Email'
               value={ email } 
@@ -199,6 +202,7 @@ export default function Registration({ setUser }){
           <Col>
             <Form.Group controlId="formBasicUsername">
               <Form.Control 
+                name='username'
                 type="username"
                 placeholder='Username'
                 value={ username } 
@@ -210,6 +214,7 @@ export default function Registration({ setUser }){
           <Col>
             <Form.Group  controlId="formBasicPassword">
               <Form.Control
+                name='password'
                 type={type} 
                 placeholder='Password'
                 value={ password } 
@@ -228,6 +233,7 @@ export default function Registration({ setUser }){
           <Col>
             <Form.Group controlId="formBasicHouseNum">
               <Form.Control
+                name='housenum'
                 type="houseNum"
                 placeholder='House or Apt #'
                 value={ houseNum } 
@@ -239,6 +245,7 @@ export default function Registration({ setUser }){
           <Col>
             <Form.Group controlId="formBasicStreetAddress">
               <Form.Control
+                name='streetaddress'
                 type="streetAddress"
                 placeholder='Street Address'
                 value={ streetAddress } 
@@ -253,6 +260,7 @@ export default function Registration({ setUser }){
           <Col>
             <Form.Group controlId="formBasicCity">
               <Form.Control
+                name='city'
                 type="city"
                 placeholder='City'
                 value={ city } 
@@ -264,6 +272,7 @@ export default function Registration({ setUser }){
           <Col>
             <Form.Group controlId="formBasicZipcode">
               <Form.Control
+                name='zipcode'
                 type="zipcode"
                 placeholder='Zipcode'
                 value={ zipcode } 
@@ -278,6 +287,7 @@ export default function Registration({ setUser }){
         <Col>
             <Form.Group controlId="formBasicState">
               <Form.Control
+                name='state'
                 type="state"
                 placeholder='State'
                 value={ state } 
@@ -289,6 +299,7 @@ export default function Registration({ setUser }){
           <Col>
             <Form.Group controlId="formBasicCountry">
               <Form.Control
+                name='country'
                 type="country"
                 placeholder='Country'
                 value={ country } 
@@ -300,6 +311,7 @@ export default function Registration({ setUser }){
         </Row>
           <Form.Group className="mb-3" controlId="formBasicPhone">
             <Form.Control
+              name='phone'
               type="phone"
               placeholder='Phone Number'
               value={ phone } 

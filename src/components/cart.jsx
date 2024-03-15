@@ -207,7 +207,7 @@ export default function Cart({ cart, setCart, token, setToken, setUser, preserve
           <hr style={{ border: "1px solid black" }} />
           <Row className="g-3">
             <Card.Title>{`Subtotal (${subtotalQuantity} Items): $${subtotalPrice.toFixed(2)}`}</Card.Title>
-            <Button className="proceed-btn" variant="info" onClick={ handleSubmit }>Proceed to Checkout</Button>
+            <Button className="proceed-btn" variant="info" size="sm" onClick={ handleSubmit }>Proceed to Checkout</Button>
           </Row>
 
           <hr />
@@ -218,10 +218,10 @@ export default function Cart({ cart, setCart, token, setToken, setUser, preserve
               <p>Do you wish to login, or continue as guest?</p>
               <hr />
               <div className="d-flex justify-content-center">
-                <Button onClick={() => navigate('/checkout')} variant="warning" style={{marginRight:"25px"}}>
+                <Button onClick={() => navigate('/checkout')} size="sm" variant="warning" style={{marginRight:"25px"}}>
                   Continue as Guest
                 </Button>
-                <Button onClick={ handlePreservationOfCart } variant="warning">
+                <Button onClick={ handlePreservationOfCart } size="sm" variant="warning">
                   Login
                 </Button>
               </div>

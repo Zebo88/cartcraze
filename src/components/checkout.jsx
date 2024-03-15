@@ -30,11 +30,18 @@ export default function Checkout({ user, token, cart, setCart }){
   const [formErrors, setFormErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState(false);
+  const [summary, setSummary] = useState(false);
+  const [alertMessage, setAlertMessage] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     calculateSubtotal(cart);
   }, [cart]);
+
+  useEffect(() => {
+    // Scroll to the top of the page
+    window.scrollTo(0, 0);
+  }, [alertMessage]);
 
   useEffect(() => {
     async function getCartItems() {
@@ -97,8 +104,7 @@ export default function Checkout({ user, token, cart, setCart }){
     }
   }
 
-  function handleSubmit(e) {
-    e.preventDefault();
+  function handleSubmit() {
     const errors = {};
     let formIsValid = true;   
 
@@ -185,26 +191,33 @@ export default function Checkout({ user, token, cart, setCart }){
 
     // Clear the general error message if form is valid
     setGeneralError(""); 
-    // Clear cart from localStorage
+
+    // // Clear cart from localStorage
     if(formIsValid){
-      setOrderPlaced(true);
-      setSuccessMessage(true);
-      localStorage.removeItem("cart");
-
-      if(token){
-        // Create order for user in database (registered user feature only)
-        purchaseItems(user.user_id, token);
+        setAlertMessage(true);
       }      
-      
-      alert("Order placed!");
 
-      // After a delay, navigate to the homepage
-      setTimeout(() => {
-        navigate('/');
-      }, 1000); // Navigate after 2.25 seconds (random, but it just seemed right :P)
-    }
-
+    //   // Set success to true so the summary will be displayed
+    //   setSummary(true);
   };
+
+  function checkout(){
+    // Set the alert to false to close the confirmation alert for the purchase
+    setAlertMessage(false);
+    
+    // Clear cart from localStorage
+    setOrderPlaced(true);
+    setSuccessMessage(true);
+    localStorage.removeItem("cart");
+
+    if(token){
+      // Create order for user in database (registered user feature only)
+      purchaseItems(user.user_id, token);
+    }      
+
+    // Set success to true so the summary will be displayed
+    setSummary(true);
+  }
 
   return(
     <Container className="checkout-container">
@@ -218,7 +231,23 @@ export default function Checkout({ user, token, cart, setCart }){
           Order Placed!
         </Alert>
       }
+      { alertMessage &&
+        <Alert variant="warning">
+          <Alert.Heading>You are about to place your order.</Alert.Heading>
+          <p>Do you wish to continue?</p>
+          <hr />
+          <div className="d-flex justify-content-center">
+            <Button onClick={ () => { setAlertMessage(false); checkout(); } } size="sm" variant="warning" style={{marginRight:"25px"}}>
+              Yes
+            </Button>
+            <Button onClick={ () => navigate('/cart') } size="sm" variant="warning">
+              No
+            </Button>
+          </div>
+        </Alert>
+      }
       <hr />
+      { !summary && 
       <Row md={1} lg={1} xl={2}>
         <Col lg={6} xl={7}>
           <Container style={{marginTop:"0"}}>
@@ -229,6 +258,7 @@ export default function Checkout({ user, token, cart, setCart }){
                 <Form.Group>
                   <FormLabel>Cardholder Name:</FormLabel>
                   <Form.Control
+                    name="username"
                     type="username" 
                     placeholder="John Doe"
                     value={ name } 
@@ -240,6 +270,7 @@ export default function Checkout({ user, token, cart, setCart }){
                 <Form.Group>
                   <FormLabel>Card Number:</FormLabel>
                   <Form.Control
+                    name="cardnum"
                     type="text" 
                     placeholder="####-####-####-####"
                     value={ cardNum } 
@@ -251,6 +282,7 @@ export default function Checkout({ user, token, cart, setCart }){
                 <Form.Group as={Col}>
                   <FormLabel>Expiration Date:</FormLabel>
                   <Form.Control
+                    name="expdate"
                     type="text" 
                     placeholder="MM/YYYY"
                     value={ expDate } 
@@ -262,6 +294,7 @@ export default function Checkout({ user, token, cart, setCart }){
                 <Form.Group as={Col}>
                   <FormLabel>CVC:</FormLabel>
                   <Form.Control
+                    name="cvc"
                     type="text" 
                     placeholder="###"
                     value={ cvc } 
@@ -273,6 +306,7 @@ export default function Checkout({ user, token, cart, setCart }){
                 <Form.Group>
                 <FormLabel>Billing Address:</FormLabel>
                   <Form.Control
+                    name="billAddress"
                     type="text" 
                     placeholder="123 N 456 E"
                     value={ billAddress } 
@@ -285,6 +319,7 @@ export default function Checkout({ user, token, cart, setCart }){
                   <Row style={{marginLeft:"0"}}>
                       <FormLabel>City:</FormLabel>
                       <Form.Control
+                        name="billCity"
                         type="text" 
                         placeholder="City"
                         value={ billCity } 
@@ -294,6 +329,7 @@ export default function Checkout({ user, token, cart, setCart }){
                       {/* <Form.Control.Feedback type="invalid">{formErrors.billCity}</Form.Control.Feedback> */}
                     <FormLabel>Zipcode:</FormLabel>
                     <Form.Control
+                      name='billZip'
                       type="text" 
                       placeholder="#####"
                       value={ billZipcode } 
@@ -307,6 +343,7 @@ export default function Checkout({ user, token, cart, setCart }){
                   <Row style={{margin:"0"}}>
                   <FormLabel>State:</FormLabel>
                     <Form.Select
+                      name="billState"
                       type="text" 
                       placeholder="State"
                       value={ billState } 
@@ -325,6 +362,7 @@ export default function Checkout({ user, token, cart, setCart }){
                     {/* <Form.Control.Feedback type="invalid">{formErrors.billState}</Form.Control.Feedback> */}
                     <FormLabel>Country:</FormLabel>
                     <Form.Control
+                      name="billCountry"
                       type="text" 
                       placeholder="USA"
                       value={ billCountry } 
@@ -357,6 +395,7 @@ export default function Checkout({ user, token, cart, setCart }){
                 <Form.Group>
                   <FormLabel>Name:</FormLabel>
                   <Form.Control
+                    name="shipname"
                     type="username" 
                     placeholder="John Doe"
                     value={ shipName } 
@@ -368,6 +407,7 @@ export default function Checkout({ user, token, cart, setCart }){
                 <Form.Group>
                 <FormLabel>Address:</FormLabel>
                   <Form.Control
+                    name="shipAddress"
                     type="text" 
                     placeholder="123 N 456 E"
                     value={ shipAddress } 
@@ -380,6 +420,7 @@ export default function Checkout({ user, token, cart, setCart }){
                   <Row style={{margin:"0"}}>                      
                       <FormLabel>City:</FormLabel>
                       <Form.Control
+                        name="shipCity"
                         type="text" 
                         placeholder="City"
                         value={ shipCity } 
@@ -389,6 +430,7 @@ export default function Checkout({ user, token, cart, setCart }){
                       {/* <Form.Control.Feedback type="invalid">{formErrors.shipCity}</Form.Control.Feedback> */}
                     <FormLabel>Zipcode:</FormLabel>
                     <Form.Control
+                      name="shipZip"
                       type="text" 
                       placeholder="#####"
                       value={ shipZipcode } 
@@ -402,6 +444,7 @@ export default function Checkout({ user, token, cart, setCart }){
                   <Row style={{marginRight:"0", paddingRight:"0"}}>                    
                     <FormLabel>State:</FormLabel>
                       <Form.Select
+                        name="shipState"
                         type="text" 
                         placeholder="State"
                         value={ shipState } 
@@ -420,6 +463,7 @@ export default function Checkout({ user, token, cart, setCart }){
                       {/* <Form.Control.Feedback type="invalid">{formErrors.shipState}</Form.Control.Feedback> */}
                       <FormLabel>Country:</FormLabel>
                       <Form.Control
+                        name="shipCountry"
                         type="text" 
                         placeholder="USA"
                         value={ shipCountry } 
@@ -467,6 +511,42 @@ export default function Checkout({ user, token, cart, setCart }){
             </Container>
           </Col>
         </Row>  
+        }
+
+        { summary &&
+          <Row>
+              <Container style={{margin:"0"}}>
+                <Card style={{padding:"20px"}}>
+                  <Card.Title style={{fontSize:"18pt"}}>Order Summary</Card.Title>
+                  <hr />
+                  <div className="summary-container">
+                    {cart && cart.products && cart.products.map((item, index) => (
+                        <div className="order-summary" key={index}>
+                          <p>{`${item.title} (${item.quantity}):`}</p>
+                          <p>${(item.price * item.quantity).toFixed(2)}</p>
+                        </div>
+                      ))
+                    }
+                    <hr />
+                    <div className="order-summary">
+                      <p>Subtotal:</p><p>${subtotalPrice.toFixed(2)}</p>
+                    </div>
+                    <div className="order-summary">
+                      <p>Shipping and Handling:</p><p>$3.00</p>
+                    </div>
+                    <div className="order-summary">
+                      <p>Tax:</p><p>$3.00</p>
+                    </div>
+                    <hr />
+                    <div className="order-summary">
+                      <h5>Total:</h5><p>${(subtotalPrice + 6.00).toFixed(2)}</p>
+                    </div>
+                  </div>
+                  <Button variant="secondary" style={{ width:"100px"}} onClick={ ()=> { navigate('/') } }>Dismiss</Button>
+                  </Card>
+                </Container>
+            </Row>  
+        }
       </Card>
     </Container>
   )

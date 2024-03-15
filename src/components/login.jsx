@@ -133,6 +133,7 @@ export default function Login({ setToken, setUser, preservedCart, setPreservedCa
         <Form onSubmit={ handleLoginSubmit }>
           <Form.Group className="mb-3" controlId="formBasicEmail">
             <Form.Control 
+              name="username"
               type="username" 
               placeholder="Enter username" 
               value={ username } 
@@ -141,6 +142,7 @@ export default function Login({ setToken, setUser, preservedCart, setPreservedCa
           </Form.Group>
           <Form.Group className="mb-3" controlId="formBasicPassword">
             <Form.Control
+              name="password"
               placeholder="Password" type={type} 
               value={ password } 
               onChange={ (e) => {setPassword(e.target.value); setMessage(null)}}
