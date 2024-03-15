@@ -15,6 +15,7 @@ export default function Cart({ cart, setCart, token, setToken, setUser, preserve
   const [subtotalPrice, setSubtotalPrice] = useState(0);
   const [message, setMessage] = useState("There are no items in your cart!");
   const [notRegistered, setNotRegistered] = useState(false);
+  const [deletedProduct, setDeletedProduct] = useState(false);
 
   useEffect(() => {
     // Calculate subtotal when cart data changes
@@ -118,6 +119,8 @@ export default function Cart({ cart, setCart, token, setToken, setUser, preserve
       // Update state
       setCart({ products: updatedCart });
       
+      // Set message state
+      setDeletedProduct(true);
   
       console.log("Item deleted successfully!");
     } catch (error) {
@@ -224,6 +227,10 @@ export default function Cart({ cart, setCart, token, setToken, setUser, preserve
               </div>
             </Alert>
           }
+
+          {deletedProduct &&
+            <Alert variant="light" onClose={() => setDeletedProduct(false)} dismissible>Product deleted from cart!</Alert>
+          }
           
           {cart.products?.length > 0 ? cart.products.map((item, idx) => (
             <Row key={idx} className="g-4">
@@ -282,7 +289,7 @@ export default function Cart({ cart, setCart, token, setToken, setUser, preserve
             </Row>
           ))
           :
-          <Alert variant="warning">
+          <Alert variant="dark">
             {message}
           </Alert>
         }

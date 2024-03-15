@@ -112,7 +112,7 @@ export default function Registration({ setUser }){
   
         if(response.user){
           variant = "success";
-          setMessage("Successfully registered! Please login to you new account!");
+          setMessage("Please login to you new account!");
           setTimeout(() => {
             navigate('/login'); //No token is received, so I need to route the user to the login page so they can get a token.
           }, 3000); // Navigate after 3 seconds 
@@ -143,13 +143,15 @@ export default function Registration({ setUser }){
 
   return(
     <div className="main-container">
-      { message && message !== "Successfully registered! Please login to you new account!" &&
+      { message && message !== "Please login to you new account!" &&
           <Alert variant="danger" onClose={ dismissAlert } dismissible className="alert-container">
             <p>{ message }</p>
           </Alert>
       }
-      { message && message === "Successfully registered! Please login to you new account!" &&
+      { message && message === "Please login to you new account!" &&
           <Alert variant="success" onClose={ dismissAlert } dismissible className="alert-container">
+            <Alert.Heading>Successfully registered!</Alert.Heading>
+            <hr />
             <p>{ message }</p>
           </Alert>
       }

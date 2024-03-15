@@ -96,10 +96,16 @@ input[type="search"] {
   margin: 0 10px 0 0;
   width: 100%;
 }
-.navSearch {
-  width: 50% !important;
+
+.navSearchForm {
+  width: 40% !important;
   order: 2;
 }
+
+.navSearch {
+  width: 100% !important;
+}
+
 
 .searchBtn {
   position: absolute;
@@ -140,9 +146,9 @@ input[type="search"] {
     padding: 10px 5px 15px 5px !important;
   }
 
-  .navSearch{
-    margin: 5px 0 10px;
+  .navSearchForm {
     width: 100% !important;
+    margin: 5px 0 10px;
     order: 4;
   }
 

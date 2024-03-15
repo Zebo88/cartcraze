@@ -45,6 +45,7 @@ export default function NavigationBar({ token, searchInput, setSearchInput, setP
               <h5 className="navBrandName">CartCraze</h5>
             </div>
           </Navbar.Brand>
+          <Form className="navSearchForm">
           <InputGroup size="sm" className="navSearch">
             <Form.Control
               type="text"
@@ -56,16 +57,18 @@ export default function NavigationBar({ token, searchInput, setSearchInput, setP
               id="button-addon2"
               onClick={ (e) => { handleSubmit(e) }}
               tabIndex={0} // Ensure the button is focusable
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  handleSubmit(e);
-                }
-              }}
+              // onKeyDown={(e) => {
+              //   if (e.key === 'Enter') {
+              //     e.preventDefault();
+              //     handleSubmit(e);
+              //   }
+              // }}
             >
               <img src={magnifyingGlass} alt="search" className="search-icon" />
             </Button>
           </InputGroup>
+          </Form>
+          
           <div className="navLinks">
             <Dropdown>
               <Dropdown.Toggle variant="dark" bg="dark" id="dropdown-basic">

@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Nav from 'react-bootstrap/Nav';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -32,6 +33,7 @@ export default function Account({ token, setToken, user, setUser, orderHistory, 
   const [message, setMessage] = useState(false);
   const [variant, setVariant] = useState("success");
   const [display, setDisplay] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function getOrderHistoryAndUser() {
@@ -174,7 +176,7 @@ function dismissAlert(){
                   <Form.Control id='password' type="password" placeholder="**********" readOnly />
                   <Form.Label>Address</Form.Label>
                   <Form.Control id='address' as="textarea" placeholder={`${user.housenum} ${user.street}, ${user.city}, ${user.state}, ${user.zipcode}, ${user.country}`} readOnly />
-                  <Button variant="secondary" style={{margin:"30px 0px"}} onClick={ handleClick }>Update Info</Button>
+                  <Button variant="outline-secondary" size="sm" style={{margin:"30px 0px"}} onClick={ handleClick }>Update Info</Button>
                 </Form>
               </Card.Body>              
           </Card>
@@ -235,7 +237,12 @@ function dismissAlert(){
                   </Col>
                 </Row>
                 <Row>
-                <Button variant="info" style={{margin:"30px 0px", width:"100px"}} onClick={ handleUpdate }>Update</Button>
+                  <Col>
+                    <Button variant="outline-secondary" size="sm" style={{margin:"30px 0px", width:"100px"}} onClick={ () => setUpdate(false) }>Cancel</Button>
+                  </Col>
+                  <Col>
+                    <Button variant="info" size="sm" style={{margin:"30px 0px", width:"100px"}} onClick={ handleUpdate }>Update</Button>
+                  </Col>
                 </Row>
               </Form>
             </Card.Body>              
