@@ -496,10 +496,10 @@ export default function Checkout({ user, token, cart, setCart }){
                   <p>Subtotal:</p><p>${subtotalPrice.toFixed(2)}</p>
                 </div>
                 <div className="order-summary">
-                  <p>Shipping and Handling:</p><p>$3.00</p>
+                  <p>Shipping and Handling:</p><p>${(subtotalPrice.toFixed(2) * .05).toFixed(2)}</p>
                 </div>
                 <div className="order-summary">
-                  <p>Tax:</p><p>$3.00</p>
+                  <p>Tax:</p><p>${(subtotalPrice.toFixed(2) * .1).toFixed(2)}</p>
                 </div>
                 <hr />
                 <div className="order-summary">
@@ -532,10 +532,10 @@ export default function Checkout({ user, token, cart, setCart }){
                       <p>Subtotal:</p><p>${subtotalPrice.toFixed(2)}</p>
                     </div>
                     <div className="order-summary">
-                      <p>Shipping and Handling:</p><p>$3.00</p>
+                      <p>Shipping and Handling:</p><p>${(subtotalPrice.toFixed(2) * .05).toFixed(2)}</p>
                     </div>
                     <div className="order-summary">
-                      <p>Tax:</p><p>$3.00</p>
+                      <p>Tax:</p><p>${(subtotalPrice.toFixed(2) * .1).toFixed(2)}</p>
                     </div>
                     <hr />
                     <div className="order-summary">

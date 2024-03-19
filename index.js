@@ -25,8 +25,8 @@ server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
 
 // Router: /api
-import apiRouter from './src/api/index.js';
-server.use('/api', apiRouter);
+import router from './src/api/index.js';
+server.use('/api', router);
 
 // 404 handler
 server.get('*', (req, res) => {
