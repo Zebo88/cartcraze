@@ -496,14 +496,14 @@ export default function Checkout({ user, token, cart, setCart }){
                   <p>Subtotal:</p><p>${subtotalPrice.toFixed(2)}</p>
                 </div>
                 <div className="order-summary">
-                  <p>Shipping and Handling:</p><p>${(subtotalPrice.toFixed(2) * .05).toFixed(2)}</p>
+                  <p>Shipping and Handling:</p><p>${(subtotalPrice * .05).toFixed(2)}</p>
                 </div>
                 <div className="order-summary">
-                  <p>Tax:</p><p>${(subtotalPrice.toFixed(2) * .1).toFixed(2)}</p>
+                  <p>Tax:</p><p>${(subtotalPrice * .1).toFixed(2)}</p>
                 </div>
                 <hr />
                 <div className="order-summary">
-                  <h5>Total:</h5><p>${(subtotalPrice + 6.00).toFixed(2)}</p>
+                  <h5>Total:</h5><p>${(subtotalPrice + (subtotalPrice * .05) + (subtotalPrice * .1)).toFixed(2)}</p>
                 </div>
               </div>
               <Button variant="info" onClick={ handleSubmit }>Checkout</Button>
@@ -532,14 +532,14 @@ export default function Checkout({ user, token, cart, setCart }){
                       <p>Subtotal:</p><p>${subtotalPrice.toFixed(2)}</p>
                     </div>
                     <div className="order-summary">
-                      <p>Shipping and Handling:</p><p>${(subtotalPrice.toFixed(2) * .05).toFixed(2)}</p>
+                      <p>Shipping and Handling:</p><p>${(subtotalPrice * .05).toFixed(2)}</p>
                     </div>
                     <div className="order-summary">
-                      <p>Tax:</p><p>${(subtotalPrice.toFixed(2) * .1).toFixed(2)}</p>
+                      <p>Tax:</p><p>${(subtotalPrice * .1).toFixed(2)}</p>
                     </div>
                     <hr />
                     <div className="order-summary">
-                      <h5>Total:</h5><p>${(subtotalPrice + 6.00).toFixed(2)}</p>
+                      <h5>Total:</h5><p>${(subtotalPrice + (subtotalPrice * .05) + (subtotalPrice * .1)).toFixed(2)}</p>
                     </div>
                   </div>
                   <Button variant="secondary" style={{ width:"100px"}} onClick={ ()=> { navigate('/') } }>Dismiss</Button>
