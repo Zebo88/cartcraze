@@ -1,5 +1,5 @@
 
-const API_URL = 'http://localhost:3000/api/cart';
+const API_URL = 'https://cartcraze.onrender.com/api/cart';
 
 // Get all carts
 export async function getAllCarts(){

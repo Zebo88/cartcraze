@@ -1,5 +1,5 @@
 // Login
-const API_URL = "https://fakestoreapi.com/auth/login";
+const API_URL = "https://cartcraze.onrender.com/auth/login";
 
 // User Login Function
 export async function login(username, password){

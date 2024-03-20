@@ -1,5 +1,5 @@
 
-const API_URL = 'http://localhost:3000/api/user';
+const API_URL = 'https://cartcraze.onrender.com/api/user';
 
 
 // User Login Function

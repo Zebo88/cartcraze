@@ -1,5 +1,5 @@
 
-const API_URL = 'http://localhost:3000/api/orders';
+const API_URL = 'https://cartcraze.onrender.com/api/orders';
 
 // Function to create a new order
 export async function createOrder(userId, token) {
