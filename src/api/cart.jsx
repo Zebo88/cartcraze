@@ -13,7 +13,7 @@ export async function getAllCarts(){
   }
 }
 
-// Get users' carts (ex: http://localhost:3000/api/user/2 will get all the carts for user #2)
+// Get users' carts 
 export async function getAllCartsForUser(userId, token){
   try {
     const response = await fetch(`${API_URL}/user/${userId}`, {
