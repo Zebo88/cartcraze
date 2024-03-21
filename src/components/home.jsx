@@ -79,8 +79,8 @@ export default function Home({ products, setProducts, setSingleProductId, setRec
     <Row xs={2} sm={2} md={3} lg={4} xl={5} className="g-4">
       {products[0] ?
             products.map((product, idx) => (
-              <Col key={idx} style={{ minWidth: '175px', maxWidth: 'none' }}>
-                <Card style={{ height: '30rem', boxShadow: '2px 2px 10px 0 rgba(0, 0, 0, 0.1)' }}>
+              <Col key={idx} style={{ minWidth: '165px', maxWidth: 'none' }}>
+                <Card style={{ height: '32rem', boxShadow: '2px 2px 10px 0 rgba(0, 0, 0, 0.1)' }}>
                 <Card.Img 
                     className="card-img" 
                     variant="top" 
