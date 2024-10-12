@@ -5,9 +5,15 @@ const url = "postgresql://cartcraze_db_eqcv_user:Jng89PQTfX779unLvhuPC8739mEVnKQ
 
 const connectionString = process.env.DATABASE_URL || url;
 
+// const client = new Client({
+//   connectionString,
+//   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
+// });
 const client = new Client({
-  connectionString,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
+  connectionString: process.env.DATABASE_URL || url,
+  ssl: {
+    rejectUnauthorized: false, // Set to true in production for enhanced security
+  },
 });
 
 export default client;
