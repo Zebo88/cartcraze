@@ -12,7 +12,7 @@ dotenv.config();
 const server = express();
 
 // Connect to the server
-const { PORT = 3000 } = process.env;
+const { PORT = 10000 } = process.env;
 
 // Bring in the DB connection
 import client from './src/db/client.js';
