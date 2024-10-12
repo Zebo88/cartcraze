@@ -1,5 +1,5 @@
 
-const API_URL = 'https://cartcraze.onrender.com/api/cart';
+const API_URL = 'postgresql://cartcraze_db_eqcv_user:Jng89PQTfX779unLvhuPC8739mEVnKQw@dpg-cs4s01q3esus73alfo7g-a/cartcraze_db_eqcv';
 
 // Get all carts
 export async function getAllCarts(){
