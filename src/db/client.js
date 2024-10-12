@@ -1,7 +1,7 @@
 import pkg from 'pg';
 const { Client } = pkg;
 
-const connectionString = process.env.DATABASE_URL || 'https://localhost:5432/cartcraze_db';
+const connectionString = process.env.DATABASE_URL || 'postgresql://cartcraze_db_eqcv_user:Jng89PQTfX779unLvhuPC8739mEVnKQw@dpg-cs4s01q3esus73alfo7g-a/cartcraze_db_eqcv';
 
 const client = new Client({
   connectionString,
