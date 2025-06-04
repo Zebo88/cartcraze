@@ -1,8 +1,8 @@
 import pkg from 'pg';
 const { Client } = pkg;
 
-// const url = "postgresql://cartcraze_db_eqcv_user:Jng89PQTfX779unLvhuPC8739mEVnKQw@dpg-cs4s01q3esus73alfo7g-a.oregon-postgres.render.com/cartcraze_db_eqcv";
-const url = "postgresql://cartcraze_db_2_user:bHOTlyrjMmB3ENlc3dejdOvywh99igFV@dpg-ctd3c2lumphs73bfnou0-a/cartcraze_db_2";
+
+const url = "postgresql://cartcraze_db_2_o7a9_user:iyrCdNEf8NMP1RrD7L865T1AG5ZHtiLn@dpg-d0vor50gjchc73a0hh8g-a/cartcraze_db_2_o7a9";
 const connectionString = process.env.DATABASE_URL || url;
 
 // const client = new Client({
